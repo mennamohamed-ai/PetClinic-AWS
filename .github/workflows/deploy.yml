@@ -10,6 +10,8 @@ env:
   AWS_REGION: us-east-1
   ECR_REGISTRY: 515060545576.dkr.ecr.us-east-1.amazonaws.com
   ENVIRONMENT: prod 
+  S3_BUCKET: petclinic-prod-frontend-assets-515060545576
+  CLOUDFRONT_ID: E8ZRDXZX46Q4G
 
 jobs:
   # ============ Build and Push Docker Images ============
@@ -22,7 +24,8 @@ jobs:
     strategy:
       fail-fast: false 
       matrix:
-        service: [backend, api-gateway, ml-service, frontend]
+        # شيلنا الـ frontend من هنا عشان هنعمله معاملة خاصة للـ S3
+        service: [backend, api-gateway, ml-service]
         include:
           - service: backend
             dockerfile: Backend/Dockerfile
@@ -33,9 +36,6 @@ jobs:
           - service: ml-service
             dockerfile: ml-service/Dockerfile
             context: ./ml-service
-          - service: frontend
-            dockerfile: Frontend/Dockerfile
-            context: ./Frontend
     
     steps:
       - name: Checkout code
@@ -55,12 +55,50 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: ${{ matrix.context }}
-          # تعديل: بما أننا داخل الفولدر، نستخدم Dockerfile مباشرة
           file: ${{ matrix.dockerfile }} 
           tags: |
             ${{ env.ECR_REGISTRY }}/petclinic-prod-${{ matrix.service }}:${{ github.sha }}
             ${{ env.ECR_REGISTRY }}/petclinic-prod-${{ matrix.service }}:latest
           push: true
+
+  # ============ Special Job for Frontend (S3 Deploy) ============
+  frontend-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        working-directory: ./Frontend
+        run: npm ci
+
+      - name: Build Frontend
+        working-directory: ./Frontend
+        env:
+          # بنبعت المتغير وقت الـ Build عشان Vite يحطه في ملفات الـ JS
+          VITE_APP_API_URL: http://petclinic-prod-alb-2142133629.us-east-1.elb.amazonaws.com
+        run: npm run build
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::515060545576:role/GitHubActionsRole
+          aws-region: us-east-1
+
+      - name: Deploy to S3
+        # السطر ده هو اللي هيملى الـ Bucket الفاضي بملفات الـ dist
+        run: aws s3 sync Frontend/dist s3://${{ env.S3_BUCKET }} --delete
+
+      - name: Invalidate CloudFront
+        run: aws cloudfront create-invalidation --distribution-id ${{ env.CLOUDFRONT_ID }} --paths "/*"
 
   # ============ Deploy to ECS ============
   deploy:
@@ -86,10 +124,3 @@ jobs:
           aws ecs update-service --cluster petclinic-prod-cluster --service petclinic-prod-backend-service --force-new-deployment --region us-east-1
           aws ecs update-service --cluster petclinic-prod-cluster --service petclinic-prod-api-gateway-service --force-new-deployment --region us-east-1
           aws ecs update-service --cluster petclinic-prod-cluster --service petclinic-prod-ml-service --force-new-deployment --region us-east-1
-
-      - name: Update CloudFront for Frontend
-        run: |
-          DISTRIBUTION_ID=$(aws cloudfront list-distributions --query "DistributionList.Items[?Comment=='petclinic-prod-cloudfront'].Id" --output text --region us-east-1)
-          if [ "$DISTRIBUTION_ID" != "None" ] && [ ! -z "$DISTRIBUTION_ID" ]; then
-            aws cloudfront create-invalidation --distribution-id $DISTRIBUTION_ID --paths "/*" --region us-east-1
-          fi
