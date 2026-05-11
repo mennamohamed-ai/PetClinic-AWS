@@ -20,7 +20,7 @@ jobs:
       id-token: write
     
     strategy:
-      fail-fast: false # عشان لو خدمة فشلت، الباقي يكمل ونعرف نصلح كل واحدة لوحدها
+      fail-fast: false 
       matrix:
         service: [backend, api-gateway, ml-service, frontend]
         include:
@@ -55,17 +55,17 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: ${{ matrix.context }}
-          file: ${{ matrix.matrix.dockerfile }} # سيتم استخدام المسار الصحيح من الماتريكس
+          # تعديل: بما أننا داخل الفولدر، نستخدم Dockerfile مباشرة
+          file: ${{ matrix.dockerfile }} 
           tags: |
-            ${{ env.ECR_REGISTRY }}/petclinic-${{ matrix.service }}:${{ github.sha }}
-            ${{ env.ECR_REGISTRY }}/petclinic-${{ matrix.service }}:latest
+            ${{ env.ECR_REGISTRY }}/petclinic-prod-${{ matrix.service }}:${{ github.sha }}
+            ${{ env.ECR_REGISTRY }}/petclinic-prod-${{ matrix.service }}:latest
           push: true
 
   # ============ Deploy to ECS ============
   deploy:
     needs: build-and-push
     runs-on: ubuntu-latest
-    # مسموح بالرفع فقط من الـ main عشان نضمن استقرار البيئة
     if: github.ref == 'refs/heads/main'
     permissions:
       contents: read
