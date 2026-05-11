@@ -1,16 +1,14 @@
 FROM maven:3.9-eclipse-temurin-21 AS build
 WORKDIR /app
 
-COPY pom.xml .
-RUN mvn dependency:go-offline -B
+COPY pom.xml . 
 
-COPY src ./src
-RUN mvn clean package -DskipTests
+COPY api-gateway/ ./api-gateway/
+
+RUN mvn clean package -DskipTests -pl api-gateway -am
 
 FROM eclipse-temurin:21-jre-jammy
 WORKDIR /app
-
-COPY --from=build /app/target/*.jar app.jar
-
+COPY --from=build /app/api-gateway/target/*.jar app.jar
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "app.jar"]
