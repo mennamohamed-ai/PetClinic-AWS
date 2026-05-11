@@ -9,7 +9,6 @@ on:
 env:
   AWS_REGION: us-east-1
   ECR_REGISTRY: 515060545576.dkr.ecr.us-east-1.amazonaws.com
-  # تحديد البيئة "prod" بشكل افتراضي لتجنب أخطاء الـ Tags
   ENVIRONMENT: prod 
 
 jobs:
@@ -21,21 +20,22 @@ jobs:
       id-token: write
     
     strategy:
+      fail-fast: false # عشان لو خدمة فشلت، الباقي يكمل ونعرف نصلح كل واحدة لوحدها
       matrix:
         service: [backend, api-gateway, ml-service, frontend]
         include:
           - service: backend
             dockerfile: Backend/Dockerfile
-            context: .
+            context: ./Backend
           - service: api-gateway
             dockerfile: api-gateway/Dockerfile
-            context: .
+            context: ./api-gateway
           - service: ml-service
             dockerfile: ml-service/Dockerfile
-            context: .
+            context: ./ml-service
           - service: frontend
             dockerfile: Frontend/Dockerfile
-            context: .
+            context: ./Frontend
     
     steps:
       - name: Checkout code
@@ -55,7 +55,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: ${{ matrix.context }}
-          file: ${{ matrix.dockerfile }}
+          file: ${{ matrix.matrix.dockerfile }} # سيتم استخدام المسار الصحيح من الماتريكس
           tags: |
             ${{ env.ECR_REGISTRY }}/petclinic-${{ matrix.service }}:${{ github.sha }}
             ${{ env.ECR_REGISTRY }}/petclinic-${{ matrix.service }}:latest
@@ -65,6 +65,7 @@ jobs:
   deploy:
     needs: build-and-push
     runs-on: ubuntu-latest
+    # مسموح بالرفع فقط من الـ main عشان نضمن استقرار البيئة
     if: github.ref == 'refs/heads/main'
     permissions:
       contents: read
@@ -82,13 +83,8 @@ jobs:
 
       - name: Deploy Services to ECS
         run: |
-          # تحديث خدمة الـ Backend
           aws ecs update-service --cluster petclinic-prod-cluster --service petclinic-prod-backend-service --force-new-deployment --region us-east-1
-          
-          # تحديث خدمة الـ API Gateway
           aws ecs update-service --cluster petclinic-prod-cluster --service petclinic-prod-api-gateway-service --force-new-deployment --region us-east-1
-          
-          # تحديث خدمة الـ ML
           aws ecs update-service --cluster petclinic-prod-cluster --service petclinic-prod-ml-service --force-new-deployment --region us-east-1
 
       - name: Update CloudFront for Frontend
