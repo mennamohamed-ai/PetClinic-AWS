@@ -63,8 +63,7 @@ jobs:
             ${{ env.ECR_REGISTRY }}/petclinic-${{ matrix.service }}:${{ github.sha }}
             ${{ env.ECR_REGISTRY }}/petclinic-${{ matrix.service }}:${{ env.ENVIRONMENT }}-latest
           push: true
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          
       
       - name: Image digest for ${{ matrix.service }}
         run: echo ${{ steps.docker_build.outputs.digest }}
