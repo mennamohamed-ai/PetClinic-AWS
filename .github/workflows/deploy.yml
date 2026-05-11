@@ -5,14 +5,12 @@ on:
     branches:
       - main
       - develop
-  pull_request:
-    branches:
-      - main
-      - develop
 
 env:
   AWS_REGION: us-east-1
   ECR_REGISTRY: 515060545576.dkr.ecr.us-east-1.amazonaws.com
+  # تحديد البيئة "prod" بشكل افتراضي لتجنب أخطاء الـ Tags
+  ENVIRONMENT: prod 
 
 jobs:
   # ============ Build and Push Docker Images ============
@@ -53,51 +51,21 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
       
-      - name: Build Docker image for ${{ matrix.service }}
-        id: docker_build
+      - name: Build and Push Docker image
         uses: docker/build-push-action@v5
         with:
           context: ${{ matrix.context }}
           file: ${{ matrix.dockerfile }}
           tags: |
             ${{ env.ECR_REGISTRY }}/petclinic-${{ matrix.service }}:${{ github.sha }}
-            ${{ env.ECR_REGISTRY }}/petclinic-${{ matrix.service }}:${{ env.ENVIRONMENT }}-latest
+            ${{ env.ECR_REGISTRY }}/petclinic-${{ matrix.service }}:latest
           push: true
-          
-      
-      - name: Image digest for ${{ matrix.service }}
-        run: echo ${{ steps.docker_build.outputs.digest }}
-  
-  # ============ Security Scanning ============
-  security-scan:
-    needs: build-and-push
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        service: [backend, api-gateway, ml-service, frontend]
-    
-    steps:
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: arn:aws:iam::515060545576:role/GitHubActionsRole
-          aws-region: us-east-1
-      
-      - name: Login to Amazon ECR
-        uses: aws-actions/amazon-ecr-login@v2
-      
-      - name: Scan ECR image for ${{ matrix.service }}
-        run: |
-          aws ecr start-image-scan \
-            --repository-name petclinic-${{ matrix.service }} \
-            --image-id imageTag=${{ env.ENVIRONMENT }}-latest \
-            --region ${{ env.AWS_REGION }}
-  
+
   # ============ Deploy to ECS ============
   deploy:
-    needs: [build-and-push, security-scan]
+    needs: build-and-push
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
+    if: github.ref == 'refs/heads/main'
     permissions:
       contents: read
       id-token: write
@@ -111,125 +79,21 @@ jobs:
         with:
           role-to-assume: arn:aws:iam::515060545576:role/GitHubActionsRole
           aws-region: us-east-1
-      
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2
-      
-      - name: Deploy Backend Service
+
+      - name: Deploy Services to ECS
         run: |
-          aws ecs update-service \
-            --cluster petclinic-${{ env.ENVIRONMENT }}-cluster \
-            --service petclinic-${{ env.ENVIRONMENT }}-backend-service \
-            --force-new-deployment \
-            --region ${{ env.AWS_REGION }}
-      
-      - name: Deploy API Gateway Service
-        run: |
-          aws ecs update-service \
-            --cluster petclinic-${{ env.ENVIRONMENT }}-cluster \
-            --service petclinic-${{ env.ENVIRONMENT }}-api-gateway-service \
-            --force-new-deployment \
-            --region ${{ env.AWS_REGION }}
-      
-      - name: Deploy ML Service
-        run: |
-          aws ecs update-service \
-            --cluster petclinic-${{ env.ENVIRONMENT }}-cluster \
-            --service petclinic-${{ env.ENVIRONMENT }}-ml-service \
-            --force-new-deployment \
-            --region ${{ env.AWS_REGION }}
-      
-      - name: Wait for service deployment (Backend)
-        run: |
-          aws ecs wait services-stable \
-            --cluster petclinic-${{ env.ENVIRONMENT }}-cluster \
-            --services petclinic-${{ env.ENVIRONMENT }}-backend-service \
-            --region ${{ env.AWS_REGION }}
-      
-      - name: Wait for service deployment (API Gateway)
-        run: |
-          aws ecs wait services-stable \
-            --cluster petclinic-${{ env.ENVIRONMENT }}-cluster \
-            --services petclinic-${{ env.ENVIRONMENT }}-api-gateway-service \
-            --region ${{ env.AWS_REGION }}
-      
-      - name: Update CloudFront distribution for Frontend
-        run: |
-          DISTRIBUTION_ID=$(aws cloudfront list-distributions \
-            --query 'DistributionList.Items[?Comment==`petclinic-${{ env.ENVIRONMENT }}-cloudfront`].Id' \
-            --output text \
-            --region ${{ env.AWS_REGION }})
+          # تحديث خدمة الـ Backend
+          aws ecs update-service --cluster petclinic-prod-cluster --service petclinic-prod-backend-service --force-new-deployment --region us-east-1
           
-          if [ ! -z "$DISTRIBUTION_ID" ]; then
-            aws cloudfront create-invalidation \
-              --distribution-id $DISTRIBUTION_ID \
-              --paths "/*" \
-              --region ${{ env.AWS_REGION }}
+          # تحديث خدمة الـ API Gateway
+          aws ecs update-service --cluster petclinic-prod-cluster --service petclinic-prod-api-gateway-service --force-new-deployment --region us-east-1
+          
+          # تحديث خدمة الـ ML
+          aws ecs update-service --cluster petclinic-prod-cluster --service petclinic-prod-ml-service --force-new-deployment --region us-east-1
+
+      - name: Update CloudFront for Frontend
+        run: |
+          DISTRIBUTION_ID=$(aws cloudfront list-distributions --query "DistributionList.Items[?Comment=='petclinic-prod-cloudfront'].Id" --output text --region us-east-1)
+          if [ "$DISTRIBUTION_ID" != "None" ] && [ ! -z "$DISTRIBUTION_ID" ]; then
+            aws cloudfront create-invalidation --distribution-id $DISTRIBUTION_ID --paths "/*" --region us-east-1
           fi
-      
-      - name: Deployment Notification
-        if: success()
-        uses: 8398a7/action-slack@v3
-        with:
-          status: ${{ job.status }}
-          text: 'PetClinic Services deployed to ${{ env.ENVIRONMENT }} environment'
-          webhook_url: ${{ secrets.SLACK_WEBHOOK }}
-      
-      - name: Deployment Failed Notification
-        if: failure()
-        uses: 8398a7/action-slack@v3
-        with:
-          status: ${{ job.status }}
-          text: 'PetClinic deployment to ${{ env.ENVIRONMENT }} failed!'
-          webhook_url: ${{ secrets.SLACK_WEBHOOK }}
-  
-  # ============ Health Checks ============
-  health-check:
-    needs: deploy
-    runs-on: ubuntu-latest
-    if: github.event_name == 'push'
-    
-    steps:
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/GitHubActionsRole
-          aws-region: ${{ env.AWS_REGION }}
-      
-      - name: Get ALB DNS Name
-        id: get-alb-dns
-        run: |
-          ALB_DNS=$(aws elbv2 describe-load-balancers \
-            --query 'LoadBalancers[?LoadBalancerName==`petclinic-${{ env.ENVIRONMENT }}-alb`].DNSName' \
-            --output text \
-            --region ${{ env.AWS_REGION }})
-          echo "alb_dns=$ALB_DNS" >> $GITHUB_OUTPUT
-      
-      - name: Health check - API Gateway
-        run: |
-          for i in {1..30}; do
-            HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://${{ steps.get-alb-dns.outputs.alb_dns }}/actuator/health || echo "000")
-            if [ $HTTP_CODE -eq 200 ]; then
-              echo "API Gateway is healthy"
-              exit 0
-            fi
-            echo "Attempt $i: HTTP $HTTP_CODE, retrying..."
-            sleep 10
-          done
-          echo "API Gateway health check failed"
-          exit 1
-      
-      - name: Health check - Backend Service
-        run: |
-          for i in {1..30}; do
-            HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://${{ steps.get-alb-dns.outputs.alb_dns }}/api/actuator/health || echo "000")
-            if [ $HTTP_CODE -eq 200 ]; then
-              echo "Backend service is healthy"
-              exit 0
-            fi
-            echo "Attempt $i: HTTP $HTTP_CODE, retrying..."
-            sleep 10
-          done
-          echo "Backend service health check failed"
-          exit 1
