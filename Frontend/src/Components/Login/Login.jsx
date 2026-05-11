@@ -29,7 +29,7 @@ export default function Login () {
       setloadingSpinner(true)
       setAPIERR(null)
       let { data } = await axios.post(
-        `http://localhost:9090/api/auth/login`,
+        `http://petclinic-prod-alb-2142133629.us-east-1.elb.amazonaws.com/api/auth/login`,
         values,
         { withCredentials: true }
       )

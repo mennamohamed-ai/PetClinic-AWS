@@ -3,7 +3,7 @@ import React, { useContext, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { UserContext } from '../../Context/UserContext'
 
-const API = 'http://localhost:9090/api'
+const API = 'http://petclinic-prod-alb-2142133629.us-east-1.elb.amazonaws.com/api'
 
 const EMPTY_RECORD = {
   appointmentId: '', petId: '', diagnosis: '',

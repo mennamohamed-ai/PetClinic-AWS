@@ -3,7 +3,7 @@ import axios from 'axios'
 import { UserContext } from '../../Context/UserContext'
 import style from './MyAppointments.module.css'
 
-const API = 'http://localhost:9090/api'
+const API = 'http://petclinic-prod-alb-2142133629.us-east-1.elb.amazonaws.com/api'
 
 export default function MyAppointments () {
   const { UserID } = useContext(UserContext)

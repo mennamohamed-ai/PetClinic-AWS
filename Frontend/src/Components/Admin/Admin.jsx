@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { UserContext } from '../../Context/UserContext'
 import axios from 'axios'
 
-const API = 'http://localhost:9090/api'
+const API = 'http://petclinic-prod-alb-2142133629.us-east-1.elb.amazonaws.com/api'
 const ANIMAL_TYPES = ['DOG', 'CAT', 'BIRD', 'RABBIT', 'FISH', 'OTHER']
 const USER_ROLES = ['PET_OWNER', 'VET', 'RECEPTIONIST', 'ADMIN']
 const EMPTY_VET = {

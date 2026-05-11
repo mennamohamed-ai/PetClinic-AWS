@@ -4,7 +4,7 @@ import { useParams } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import { UserContext } from '../../Context/UserContext'
 
-const API = 'http://localhost:9090/api'
+const API = 'http://petclinic-prod-alb-2142133629.us-east-1.elb.amazonaws.com/api'
 
 export default function BookingAppointment () {
   const { vetId } = useParams()

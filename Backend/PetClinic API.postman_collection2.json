@@ -679,7 +679,7 @@
 	"variable": [
 		{
 			"key": "baseUrl",
-			"value": "http://localhost:9090"
+			"value": "http://petclinic-prod-alb-2142133629.us-east-1.elb.amazonaws.com"
 		}
 	]
 }

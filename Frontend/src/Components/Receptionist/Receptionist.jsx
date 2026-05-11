@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { UserContext } from '../../Context/UserContext'
 import axios from 'axios'
 
-const API = 'http://localhost:9090/api'
+const API = 'http://petclinic-prod-alb-2142133629.us-east-1.elb.amazonaws.com/api'
 
 export default function Receptionist () {
   const { userRole, UserData } = useContext(UserContext)

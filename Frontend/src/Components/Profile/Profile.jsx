@@ -33,7 +33,7 @@ export default function Profile() {
   const handleUpdate = async () => {
     setLoading(true)
     try {
-      const res = await fetch(`http://localhost:9090/api/account/${UserID}`, {
+      const res = await fetch(`http://petclinic-prod-alb-2142133629.us-east-1.elb.amazonaws.com/api/account/${UserID}`, {
         method: 'PUT',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
@@ -54,7 +54,7 @@ export default function Profile() {
   const handleDelete = async () => {
     setLoading(true)
     try {
-      const res = await fetch(`http://localhost:9090/api/account/${UserID}`, {
+      const res = await fetch(`http://petclinic-prod-alb-2142133629.us-east-1.elb.amazonaws.com/api/account/${UserID}`, {
         method: 'DELETE',
         credentials: 'include'
       })

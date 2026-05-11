@@ -18,7 +18,7 @@ export default function Register () {
       setloadingSpinner(true)
       setAPIERR(null)
       let { data } = await axios.post(
-        `http://localhost:9090/api/auth/register`,
+        `http://petclinic-prod-alb-2142133629.us-east-1.elb.amazonaws.com/api/auth/register`,
         values,
         { withCredentials: true }
       )

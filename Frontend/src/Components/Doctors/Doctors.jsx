@@ -14,7 +14,7 @@ export default function Doctors() {
 
   async function getDoctors() {
     try {
-      let { data } = await axios.get("http://localhost:9090/api/vets")
+      let { data } = await axios.get("http://petclinic-prod-alb-2142133629.us-east-1.elb.amazonaws.com/api/vets")
       setDoctors(data)
       setFilteredDoctors(data)
       console.log(data);
