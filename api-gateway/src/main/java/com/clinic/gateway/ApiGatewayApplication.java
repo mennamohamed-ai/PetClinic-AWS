@@ -19,6 +19,7 @@ public class ApiGatewayApplication {
     public CorsWebFilter corsWebFilter() {
         CorsConfiguration corsConfig = new CorsConfiguration();
         
+        // السماح للينك الـ Frontend الجديد بتاعك
         corsConfig.setAllowedOrigins(Arrays.asList("https://d1wv2cuj9zac3d.cloudfront.net", "http://localhost:3000"));
         corsConfig.setMaxAge(3600L);
         corsConfig.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
