@@ -7,7 +7,7 @@ RUN npm ci
 
 COPY . .
 
-ENV REACT_APP_API_URL=http://petclinic-prod-alb-2142133629.us-east-1.elb.amazonaws.com
+ENV VITE_APP_API_URL=http://petclinic-prod-alb-2142133629.us-east-1.elb.amazonaws.com
 
 RUN npm run build
 

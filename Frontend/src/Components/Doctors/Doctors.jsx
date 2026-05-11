@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import axios from 'axios'
 import { Link } from 'react-router-dom'
+import { createApiUrl } from '../../Services/apiService'
 
 export default function Doctors() {
   const [doctors, setDoctors] = useState([])
@@ -14,7 +15,7 @@ export default function Doctors() {
 
   async function getDoctors() {
     try {
-      let { data } = await axios.get("http://petclinic-prod-alb-2142133629.us-east-1.elb.amazonaws.com/api/vets")
+      let { data } = await axios.get(createApiUrl('/api/vets'))
       setDoctors(data)
       setFilteredDoctors(data)
       console.log(data);

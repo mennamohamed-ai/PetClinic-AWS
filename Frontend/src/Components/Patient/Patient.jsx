@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import axios from 'axios'
+import { createApiUrl } from '../../Services/apiService'
 
-const API = 'http://petclinic-prod-alb-2142133629.us-east-1.elb.amazonaws.com/api'
+const getAPI = (endpoint) => createApiUrl(`/api${endpoint}`)
 
 export default function Patient () {
   const [searchParams] = useSearchParams()
@@ -18,7 +19,7 @@ export default function Patient () {
   async function fetchPatients () {
     setLoading(true); setError(null)
     try {
-      const { data } = await axios.get(`${API}/appointments/vet/${vetId}/all`, { withCredentials: true })
+      const { data } = await axios.get(getAPI(`/appointments/vet/${vetId}/all`), { withCredentials: true })
       const groups = {}
       data.forEach(apt => {
         if (!groups[apt.ownerName])

@@ -1,6 +1,7 @@
 import React, { useContext, useState, useEffect } from 'react'
 import { UserContext } from '../../Context/UserContext'
 import styles from './Profile.module.css'
+import { createApiUrl } from '../../Services/apiService'
 
 export default function Profile() {
   const { userName, setUserName, UserPhone, setUserPhone, UserID } =
@@ -33,7 +34,7 @@ export default function Profile() {
   const handleUpdate = async () => {
     setLoading(true)
     try {
-      const res = await fetch(`http://petclinic-prod-alb-2142133629.us-east-1.elb.amazonaws.com/api/account/${UserID}`, {
+      const res = await fetch(createApiUrl(`/api/account/${UserID}`), {
         method: 'PUT',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
@@ -54,7 +55,7 @@ export default function Profile() {
   const handleDelete = async () => {
     setLoading(true)
     try {
-      const res = await fetch(`http://petclinic-prod-alb-2142133629.us-east-1.elb.amazonaws.com/api/account/${UserID}`, {
+      const res = await fetch(createApiUrl(`/api/account/${UserID}`), {
         method: 'DELETE',
         credentials: 'include'
       })

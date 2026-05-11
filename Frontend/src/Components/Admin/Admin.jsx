@@ -2,8 +2,9 @@ import React, { useContext, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { UserContext } from '../../Context/UserContext'
 import axios from 'axios'
+import { createApiUrl } from '../../Services/apiService'
 
-const API = 'http://petclinic-prod-alb-2142133629.us-east-1.elb.amazonaws.com/api'
+const getAPI = (endpoint) => createApiUrl(`/api${endpoint}`)
 const ANIMAL_TYPES = ['DOG', 'CAT', 'BIRD', 'RABBIT', 'FISH', 'OTHER']
 const USER_ROLES = ['PET_OWNER', 'VET', 'RECEPTIONIST', 'ADMIN']
 const EMPTY_VET = {
@@ -55,23 +56,23 @@ export default function Admin () {
 
   async function fetchSummary () {
     setLoading(true)
-    try { setSummary(await apiFetch(`${API}/admin/reports/summary`)) }
+    try { setSummary(await apiFetch(getAPI('/admin/reports/summary'))) }
     catch (e) { setError(e.message) } finally { setLoading(false) }
   }
   async function fetchAppointments () {
     setLoading(true)
-    try { setAppointments(await apiFetch(`${API}/admin/reports/appointments`)) }
+    try { setAppointments(await apiFetch(getAPI('/admin/reports/appointments'))) }
     catch (e) { setError(e.message) } finally { setLoading(false) }
   }
   async function fetchInvoices () {
     setLoading(true)
-    try { setInvoices(await apiFetch(`${API}/admin/reports/invoices`)) }
+    try { setInvoices(await apiFetch(getAPI('/admin/reports/invoices'))) }
     catch (e) { setError(e.message) } finally { setLoading(false) }
   }
   async function fetchUsers () {
     setLoading(true)
     try {
-      const data = await apiFetch(`${API}/admin/users`)
+      const data = await apiFetch(getAPI('/admin/users'))
       setUsers(data)
       setRoleDrafts(Object.fromEntries((data || []).map(u => [u.id, u.role])))
     }
@@ -82,7 +83,7 @@ export default function Admin () {
     const nextRole = roleDrafts[userId]
     if (!nextRole) return
     try {
-      const updated = await apiFetch(`${API}/admin/users/${userId}/role`, {
+      const updated = await apiFetch(getAPI(`/admin/users/${userId}/role`), {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ role: nextRole })
@@ -95,14 +96,14 @@ export default function Admin () {
   }
   async function fetchVets () {
     setLoading(true)
-    try { setVets(await apiFetch(`${API}/vets`)) }
+    try { setVets(await apiFetch(getAPI('/vets'))) }
     catch (e) { setError(e.message) } finally { setLoading(false) }
   }
 
   async function fetchPermissions () {
     setLoading(true)
     try {
-      const rows = await apiFetch(`${API}/admin/permissions`)
+      const rows = await apiFetch(getAPI('/admin/permissions'))
       const mapped = Object.fromEntries((rows || []).map(r => [r.role, r.permissions || {}]))
       setPermissionsByRole(mapped)
       const firstRole = Object.keys(mapped)[0]
@@ -140,11 +141,11 @@ export default function Admin () {
                         consultationFee: parseFloat(vetForm.consultationFee),
                         rating: parseFloat(vetForm.rating), experienceYears: parseInt(vetForm.experienceYears) }
       if (editingVet) {
-        await apiFetch(`${API}/vets/${editingVet.id}`, { method: 'PUT',
+        await apiFetch(getAPI(`/vets/${editingVet.id}`), { method: 'PUT',
           headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
         setSuccess('✅ Doctor updated')
       } else {
-        await apiFetch(`${API}/vets`, { method: 'POST',
+        await apiFetch(getAPI('/vets'), { method: 'POST',
           headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
         setSuccess('✅ Doctor added')
       }
@@ -156,7 +157,7 @@ export default function Admin () {
   async function confirmDelete () {
     if (!deleteTarget) return
     try {
-      await apiFetch(`${API}/vets/${deleteTarget}`, { method: 'DELETE' })
+      await apiFetch(getAPI(`/vets/${deleteTarget}`), { method: 'DELETE' })
       setSuccess('✅ Doctor deleted')
       setVets(prev => prev.filter(v => v.id !== deleteTarget))
     } catch (err) { setError(err.message) }
@@ -165,7 +166,7 @@ export default function Admin () {
 
   async function updatePermission (role, key, enabled) {
     try {
-      const updated = await apiFetch(`${API}/admin/permissions/${role}/${key}`, {
+      const updated = await apiFetch(getAPI(`/admin/permissions/${role}/${key}`), {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ enabled })

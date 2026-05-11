@@ -5,6 +5,7 @@ import * as yup from 'yup'
 import axios from 'axios'
 import { Link, useNavigate } from 'react-router-dom'
 import { UserContext } from '../../Context/UserContext'
+import { createApiUrl } from '../../Services/apiService'
 
 export default function Register () {
   const [role, setRole] = useState(null)
@@ -18,7 +19,7 @@ export default function Register () {
       setloadingSpinner(true)
       setAPIERR(null)
       let { data } = await axios.post(
-        `http://petclinic-prod-alb-2142133629.us-east-1.elb.amazonaws.com/api/auth/register`,
+        createApiUrl('/api/auth/register'),
         values,
         { withCredentials: true }
       )

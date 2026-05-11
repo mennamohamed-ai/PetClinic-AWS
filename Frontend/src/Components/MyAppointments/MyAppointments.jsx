@@ -2,8 +2,9 @@ import React, { useContext, useEffect, useState } from 'react'
 import axios from 'axios'
 import { UserContext } from '../../Context/UserContext'
 import style from './MyAppointments.module.css'
+import { createApiUrl } from '../../Services/apiService'
 
-const API = 'http://petclinic-prod-alb-2142133629.us-east-1.elb.amazonaws.com/api'
+const getAPI = (endpoint) => createApiUrl(`/api${endpoint}`)
 
 export default function MyAppointments () {
   const { UserID } = useContext(UserContext)
@@ -29,7 +30,7 @@ export default function MyAppointments () {
   useEffect(() => {
     async function loadOwner () {
       try {
-        const { data } = await axios.get(`${API}/owners/me`, { withCredentials: true })
+        const { data } = await axios.get(getAPI('/owners/me'), { withCredentials: true })
         setOwnerId(data.id)
         setOwner(data)
         setProfileForm({
@@ -49,7 +50,7 @@ export default function MyAppointments () {
   useEffect(() => {
     async function fetchPermissions () {
       try {
-        const { data } = await axios.get(`${API}/auth/me/permissions`, { withCredentials: true })
+        const { data } = await axios.get(getAPI('/auth/me/permissions'), { withCredentials: true })
         setPermissions(data?.permissions || {})
       } catch (err) {
         setPermissions({})
@@ -71,7 +72,7 @@ export default function MyAppointments () {
     if (!ownerId) return
     setLoading(true); setError(null)
     try {
-      const { data } = await axios.get(`${API}/pets/owner/${ownerId}`, { withCredentials: true })
+      const { data } = await axios.get(getAPI(`/pets/owner/${ownerId}`), { withCredentials: true })
       setPets(Array.isArray(data) ? data : [])
     } catch (err) {
       setError('Failed to load pets.')
@@ -83,7 +84,7 @@ export default function MyAppointments () {
   async function fetchAppointments () {
     setLoading(true); setError(null)
     try {
-      const { data } = await axios.get(`${API}/appointments/owner/${ownerId}`, { withCredentials: true })
+      const { data } = await axios.get(getAPI(`/appointments/owner/${ownerId}`), { withCredentials: true })
       setAppointments(Array.isArray(data) ? data : [])
     } catch (err) { setError('Failed to load appointments.') }
     finally { setLoading(false) }
@@ -92,7 +93,7 @@ export default function MyAppointments () {
   async function fetchInvoices () {
     setLoading(true); setError(null)
     try {
-      const { data } = await axios.get(`${API}/invoices/owner/${ownerId}`, { withCredentials: true })
+      const { data } = await axios.get(getAPI(`/invoices/owner/${ownerId}`), { withCredentials: true })
       setInvoices(Array.isArray(data) ? data : [])
     } catch (err) { setError('Failed to load invoices.') }
     finally { setLoading(false) }
@@ -100,7 +101,7 @@ export default function MyAppointments () {
 
   async function payInvoice (id) {
     try {
-      await axios.put(`${API}/invoices/${id}/pay`, {}, { withCredentials: true })
+      await axios.put(getAPI(`/invoices/${id}/pay`), {}, { withCredentials: true })
       setSuccess('✅ Payment successful!')
       fetchInvoices()
     } catch (err) { setError('Payment failed.') }
@@ -108,7 +109,7 @@ export default function MyAppointments () {
 
   async function cancelAppointment (id) {
     try {
-      await axios.put(`${API}/appointments/${id}/cancel`, {}, { withCredentials: true })
+      await axios.put(getAPI(`/appointments/${id}/cancel`), {}, { withCredentials: true })
       setSuccess('✅ Appointment cancelled.')
       fetchAppointments()
     } catch (err) { setError('Could not cancel appointment.') }
@@ -118,7 +119,7 @@ export default function MyAppointments () {
     if (!owner) return
     setProfileSaving(true); setError(null)
     try {
-      const { data } = await axios.put(`${API}/owners/me`, profileForm, { withCredentials: true })
+      const { data } = await axios.put(getAPI('/owners/me'), profileForm, { withCredentials: true })
       setOwner(data)
       setSuccess('✅ Profile updated.')
     } catch (err) {
@@ -143,10 +144,10 @@ export default function MyAppointments () {
         weight: parseFloat(petForm.weight)
       }
       if (editingPetId) {
-        await axios.put(`${API}/pets/${editingPetId}`, payload, { withCredentials: true })
+        await axios.put(getAPI(`/pets/${editingPetId}`), payload, { withCredentials: true })
         setSuccess('✅ Pet updated.')
       } else {
-        await axios.post(`${API}/pets`, payload, { withCredentials: true })
+        await axios.post(getAPI('/pets'), payload, { withCredentials: true })
         setSuccess('✅ Pet added.')
       }
       setPetForm({ name: '', type: 'DOG', breed: '', birthDate: '', gender: 'MALE', weight: '' })
@@ -174,7 +175,7 @@ export default function MyAppointments () {
   async function deletePet (id) {
     setError(null)
     try {
-      await axios.delete(`${API}/pets/${id}`, { withCredentials: true })
+      await axios.delete(getAPI(`/pets/${id}`), { withCredentials: true })
       setSuccess('✅ Pet deleted.')
       fetchPets()
     } catch (err) {

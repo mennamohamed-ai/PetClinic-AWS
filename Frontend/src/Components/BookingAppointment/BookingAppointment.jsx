@@ -3,8 +3,9 @@ import axios from 'axios'
 import { useParams } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import { UserContext } from '../../Context/UserContext'
+import { createApiUrl } from '../../Services/apiService'
 
-const API = 'http://petclinic-prod-alb-2142133629.us-east-1.elb.amazonaws.com/api'
+const getAPI = (endpoint) => createApiUrl(`/api${endpoint}`)
 
 export default function BookingAppointment () {
   const { vetId } = useParams()
@@ -40,9 +41,9 @@ export default function BookingAppointment () {
     async function loadOwnerAndPets () {
       try {
         setLoading(true)
-        const ownerRes = await axios.get(`${API}/owners/me`, { withCredentials: true })
+        const ownerRes = await axios.get(getAPI('/owners/me'), { withCredentials: true })
         setOwner(ownerRes.data)
-        const petsRes = await axios.get(`${API}/pets/owner/${ownerRes.data.id}`, { withCredentials: true })
+        const petsRes = await axios.get(getAPI(`/pets/owner/${ownerRes.data.id}`), { withCredentials: true })
         setPets(petsRes.data)
         if (petsRes.data.length > 0)
           setFormData(prev => ({ ...prev, petId: String(petsRes.data[0].id) }))
@@ -56,7 +57,7 @@ export default function BookingAppointment () {
   }, [UserID])
 
   async function refreshPets (ownerId) {
-    const petsRes = await axios.get(`${API}/pets/owner/${ownerId}`, { withCredentials: true })
+    const petsRes = await axios.get(getAPI(`/pets/owner/${ownerId}`), { withCredentials: true })
     setPets(petsRes.data)
     if (petsRes.data.length > 0) {
       setFormData(prev => ({ ...prev, petId: String(petsRes.data[0].id) }))
@@ -69,7 +70,7 @@ export default function BookingAppointment () {
     setPetSaving(true)
     setErrMsg(null)
     try {
-      await axios.post(`${API}/pets`, {
+      await axios.post(getAPI('/pets'), {
         ownerId: owner.id,
         name: petForm.name,
         type: petForm.type,
@@ -113,7 +114,7 @@ export default function BookingAppointment () {
         endTime: formData.endTime + ':00',
         reason: formData.reason
       }
-      await axios.post(`${API}/appointments`, payload, { withCredentials: true })
+      await axios.post(getAPI('/appointments'), payload, { withCredentials: true })
       toast.success('Appointment booked successfully!')
       setFormData({ petId: pets[0]?.id || '', appointmentDate: '', startTime: '', endTime: '', reason: '' })
     } catch (err) {

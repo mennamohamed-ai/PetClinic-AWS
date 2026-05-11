@@ -2,8 +2,9 @@ import React, { useContext, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { UserContext } from '../../Context/UserContext'
 import axios from 'axios'
+import { createApiUrl } from '../../Services/apiService'
 
-const API = 'http://petclinic-prod-alb-2142133629.us-east-1.elb.amazonaws.com/api'
+const getAPI = (endpoint) => createApiUrl(`/api${endpoint}`)
 
 export default function Receptionist () {
   const { userRole, UserData } = useContext(UserContext)
@@ -39,7 +40,7 @@ export default function Receptionist () {
   useEffect(() => {
     async function fetchPermissions () {
       try {
-        const { data } = await axios.get(`${API}/auth/me/permissions`, { withCredentials: true })
+        const { data } = await axios.get(getAPI('/auth/me/permissions'), { withCredentials: true })
         setPermissions(data?.permissions || {})
       } catch (err) {
         setPermissions({})
@@ -55,10 +56,10 @@ export default function Receptionist () {
   async function fetchAppointments () {
     setLoading(true)
     try {
-      const vetsRes = await axios.get(`${API}/vets`, { withCredentials: true })
+      const vetsRes = await axios.get(getAPI('/vets'), { withCredentials: true })
       const allApts = []
       for (const vet of vetsRes.data) {
-        const res = await axios.get(`${API}/appointments/vet/${vet.id}`, { withCredentials: true })
+        const res = await axios.get(getAPI(`/appointments/vet/${vet.id}`), { withCredentials: true })
         allApts.push(...res.data)
       }
       const unique = [...new Map(allApts.map(a => [a.id, a])).values()]
@@ -68,13 +69,13 @@ export default function Receptionist () {
   }
 
   async function fetchVets () {
-    try { const { data } = await axios.get(`${API}/vets`); setVets(data) }
+    try { const { data } = await axios.get(getAPI('/vets')); setVets(data) }
     catch (err) { console.error(err) }
   }
 
   async function fetchOwners () {
     setLoading(true)
-    try { const { data } = await axios.get(`${API}/owners`, { withCredentials: true }); setOwners(data) }
+    try { const { data } = await axios.get(getAPI('/owners'), { withCredentials: true }); setOwners(data) }
     catch (err) { setError('Failed to load owners.') }
     finally { setLoading(false) }
   }
@@ -83,7 +84,7 @@ export default function Receptionist () {
     setLoading(true)
     try {
       // جيب invoices من كل الـ appointments
-      const res = await axios.get(`${API}/invoices`, { withCredentials: true })
+      const res = await axios.get(getAPI('/invoices'), { withCredentials: true })
       setInvoices(res.data)
     } catch (err) {
       // fallback: receptionist لو مش admin, نشيل error
@@ -94,14 +95,14 @@ export default function Receptionist () {
   }
 
   async function fetchOwnerPets (ownerId) {
-    try { const { data } = await axios.get(`${API}/pets/owner/${ownerId}`, { withCredentials: true }); setOwnerPets(data) }
+    try { const { data } = await axios.get(getAPI(`/pets/owner/${ownerId}`), { withCredentials: true }); setOwnerPets(data) }
     catch (err) { setOwnerPets([]) }
   }
 
   // ── Actions ──────────────────────────────────────────────────────
   async function updateStatus (id, status) {
     try {
-      await axios.put(`${API}/appointments/${id}/status`, { status }, { withCredentials: true })
+      await axios.put(getAPI(`/appointments/${id}/status`), { status }, { withCredentials: true })
       setSuccess(`✅ Status updated to ${status}`)
       fetchAppointments()
     } catch (err) { setError(err?.response?.data?.message || 'Update failed') }
@@ -109,7 +110,7 @@ export default function Receptionist () {
 
   async function cancelAppointment (id) {
     try {
-      await axios.put(`${API}/appointments/${id}/cancel`, {}, { withCredentials: true })
+      await axios.put(getAPI(`/appointments/${id}/cancel`), {}, { withCredentials: true })
       setSuccess('✅ Appointment cancelled')
       fetchAppointments()
     } catch (err) { setError(err?.response?.data?.message || 'Cancel failed') }
@@ -118,7 +119,7 @@ export default function Receptionist () {
   async function submitBooking (e) {
     e.preventDefault(); setBookLoading(true)
     try {
-      await axios.post(`${API}/appointments`, {
+      await axios.post(getAPI('/appointments'), {
         ownerId: parseInt(bookForm.ownerId),
         petId:   parseInt(bookForm.petId),
         vetId:   parseInt(bookForm.vetId),
@@ -137,7 +138,7 @@ export default function Receptionist () {
   async function submitInvoice (e) {
     e.preventDefault(); setInvLoading(true)
     try {
-      await axios.post(`${API}/invoices`, {
+      await axios.post(getAPI('/invoices'), {
         appointmentId: parseInt(invForm.appointmentId),
         ownerId: parseInt(invForm.ownerId),
         amount: parseFloat(invForm.amount)

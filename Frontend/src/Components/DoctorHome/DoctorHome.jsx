@@ -2,8 +2,9 @@ import axios from 'axios'
 import React, { useContext, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { UserContext } from '../../Context/UserContext'
+import { createApiUrl } from '../../Services/apiService'
 
-const API = 'http://petclinic-prod-alb-2142133629.us-east-1.elb.amazonaws.com/api'
+const getAPI = (endpoint) => createApiUrl(`/api${endpoint}`)
 
 const EMPTY_RECORD = {
   appointmentId: '', petId: '', diagnosis: '',
@@ -31,7 +32,7 @@ export default function DoctorHome () {
   useEffect(() => {
     async function loadVetId () {
       try {
-        const { data } = await axios.get(`${API}/vets/me`, { withCredentials: true })
+        const { data } = await axios.get(getAPI('/vets/me'), { withCredentials: true })
         setVetId(data.id)
       } catch (err) { setError('Could not load your vet profile.') }
     }
@@ -41,7 +42,7 @@ export default function DoctorHome () {
   useEffect(() => {
     async function fetchPermissions () {
       try {
-        const { data } = await axios.get(`${API}/auth/me/permissions`, { withCredentials: true })
+        const { data } = await axios.get(getAPI('/auth/me/permissions'), { withCredentials: true })
         setPermissions(data?.permissions || {})
       } catch (err) {
         setPermissions({})
@@ -65,8 +66,8 @@ export default function DoctorHome () {
     setLoading(true); setError(null)
     try {
       const url = type === 'today'
-        ? `${API}/appointments/vet/${vetId}?date=${today}`
-        : `${API}/appointments/vet/${vetId}`
+        ? getAPI(`/appointments/vet/${vetId}?date=${today}`)
+        : getAPI(`/appointments/vet/${vetId}`)
       const { data } = await axios.get(url, { withCredentials: true })
       setPatients(data)
     } catch (err) { setError('Failed to load appointments.') }
@@ -76,7 +77,7 @@ export default function DoctorHome () {
   async function fetchRecords () {
     setLoading(true); setError(null)
     try {
-      const { data } = await axios.get(`${API}/medical-records/vet/${vetId}`, { withCredentials: true })
+      const { data } = await axios.get(getAPI(`/medical-records/vet/${vetId}`), { withCredentials: true })
       setRecords(data)
     } catch (err) { setError('Failed to load medical records.') }
     finally { setLoading(false) }
@@ -93,10 +94,10 @@ export default function DoctorHome () {
         followUpDate: recordForm.followUpDate || null
       }
       if (editingRecord) {
-        await axios.put(`${API}/medical-records/${editingRecord.id}`, payload, { withCredentials: true })
+        await axios.put(getAPI(`/medical-records/${editingRecord.id}`), payload, { withCredentials: true })
         setSuccess('✅ Record updated')
       } else {
-        await axios.post(`${API}/medical-records`, payload, { withCredentials: true })
+        await axios.post(getAPI('/medical-records'), payload, { withCredentials: true })
         setSuccess('✅ Visit documented')
       }
       setShowRecordForm(false); setEditingRecord(null); setRecordForm(EMPTY_RECORD)
