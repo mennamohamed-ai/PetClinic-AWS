@@ -84,7 +84,7 @@ jobs:
         working-directory: ./Frontend
         env:
           
-          VITE_APP_API_URL: http://petclinic-prod-alb-2142133629.us-east-1.elb.amazonaws.com:9090
+          VITE_APP_API_URL: http://petclinic-prod-alb-2142133629.us-east-1.elb.amazonaws.com
         run: npm run build
 
       - name: Configure AWS credentials
