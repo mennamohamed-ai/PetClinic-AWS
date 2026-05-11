@@ -29,7 +29,7 @@ jobs:
             context: ./Backend
           - service: api-gateway
             dockerfile: api-gateway/Dockerfile
-            context: ./api-gateway
+            context: . 
           - service: ml-service
             dockerfile: ml-service/Dockerfile
             context: ./ml-service
