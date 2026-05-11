@@ -3,7 +3,7 @@
  * يستخدم Environment Variables للـ API URL
  */
 
-const API_BASE_URL = import.meta.env.VITE_APP_API_URL || 'http://localhost:9090'
+const API_BASE_URL = import.meta.env.VITE_APP_API_URL || 'http://petclinic-prod-alb-2142133629.us-east-1.elb.amazonaws.com'
 
 export const createApiUrl = (endpoint) => {
   // تأكد من أن الـ URL يبدأ بـ /
