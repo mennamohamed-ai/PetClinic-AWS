@@ -1,0 +1,36 @@
+package com.clinic.gateway;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.reactive.CorsWebFilter;
+import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
+
+import java.util.Arrays;
+
+@Configuration
+public class CorsConfig {
+
+    @Bean
+    public CorsWebFilter corsWebFilter() {
+        CorsConfiguration corsConfig = new CorsConfiguration();
+        
+        // 1. السماح للينك الـ Frontend بتاعك (CloudFront)
+        corsConfig.setAllowedOrigins(Arrays.asList("https://d1wv2cuj9zac3d.cloudfront.net", "http://localhost:3000"));
+        
+        // 2. السماح بكل أنواع الـ Methods (GET, POST, etc)
+        corsConfig.setMaxAge(3600L);
+        corsConfig.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        
+        // 3. السماح بكل الـ Headers
+        corsConfig.addAllowedHeader("*");
+        
+        // 4. السماح بإرسال الـ Credentials لو فيه Login
+        corsConfig.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", corsConfig);
+
+        return new CorsWebFilter(source);
+    }
+}
