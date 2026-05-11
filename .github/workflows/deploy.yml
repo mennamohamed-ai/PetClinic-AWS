@@ -121,6 +121,6 @@ jobs:
 
       - name: Deploy Services to ECS
         run: |
-          aws ecs update-service --cluster petclinic-prod-cluster --service petclinic-prod-backend-service --force-new-deployment --region us-east-1
-          aws ecs update-service --cluster petclinic-prod-cluster --service petclinic-prod-api-gateway-service --force-new-deployment --region us-east-1
-          aws ecs update-service --cluster petclinic-prod-cluster --service petclinic-prod-ml-service --force-new-deployment --region us-east-1
+          aws ecs update-service --cluster petclinic-prod-cluster --service petclinic-prod-api-gateway-service --force-new-deployment --no-wait --region us-east-1
+          aws ecs update-service --cluster petclinic-prod-cluster --service petclinic-prod-backend-service --force-new-deployment --no-wait --region us-east-1
+          aws ecs update-service --cluster petclinic-prod-cluster --service petclinic-prod-ml-service --force-new-deployment --no-wait --region us-east-1
