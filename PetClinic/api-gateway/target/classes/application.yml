@@ -1,0 +1,32 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      routes:
+        - id: ml-service-api
+          uri: http://ml-service:8000
+          predicates:
+            - Path=/api/ml/**
+          filters:
+            - RewritePath=/api/ml/(?<segment>.*), /${segment}
+        - id: main-service-api
+          uri: lb://main-service
+          predicates:
+            - Path=/api/**
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URI:http://localhost:8761/eureka}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,gateway

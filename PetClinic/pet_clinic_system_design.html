@@ -1,0 +1,540 @@
+
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+.w { font-family: var(--font-sans); color: var(--color-text-primary); max-width: 840px; padding: 1.5rem 1rem; direction: rtl; text-align: right; }
+h2 { font-size: 18px; font-weight: 500; margin-bottom: 1rem; padding-bottom: 8px; border-bottom: 0.5px solid var(--color-border-tertiary); }
+h3 { font-size: 15px; font-weight: 500; margin-bottom: 6px; }
+h4 { font-size: 13px; font-weight: 500; margin-bottom: 4px; }
+p, li { font-size: 13px; color: var(--color-text-secondary); line-height: 1.8; }
+ul { list-style: none; padding: 0; }
+ul li { padding-right: 14px; position: relative; }
+ul li::before { content: "–"; position: absolute; right: 0; }
+.sec { margin-bottom: 2rem; }
+.card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem 1.25rem; margin-bottom: 10px; }
+.tag { font-size: 11px; font-weight: 500; padding: 3px 10px; border-radius: 20px; direction: ltr; display: inline-block; white-space: nowrap; }
+.t-blue{background:#E6F1FB;color:#0C447C} .t-green{background:#EAF3DE;color:#3B6D11}
+.t-amber{background:#FAEEDA;color:#854F0B} .t-red{background:#FCEBEB;color:#A32D2D}
+.t-purple{background:#EEEDFE;color:#3C3489} .t-teal{background:#E1F5EE;color:#0F6E56}
+.t-gray{background:var(--color-background-secondary);color:var(--color-text-secondary);border:0.5px solid var(--color-border-secondary)}
+.code { font-family: var(--font-mono); font-size: 12px; background: var(--color-background-secondary); border: 0.5px solid var(--color-border-secondary); border-radius: 4px; padding: 1px 6px; direction: ltr; display: inline-block; color: var(--color-text-primary); }
+.info { background: #E6F1FB; border-right: 3px solid #185FA5; border-radius: var(--border-radius-md); padding: 8px 12px; margin-top: 8px; }
+.info p { color: #042C53; font-size: 12px; }
+.warn { background: #FAEEDA; border-right: 3px solid #BA7517; border-radius: var(--border-radius-md); padding: 8px 12px; margin-top: 8px; }
+.warn p { color: #412402; font-size: 12px; }
+.ok { background: #EAF3DE; border-right: 3px solid #3B6D11; border-radius: var(--border-radius-md); padding: 8px 12px; margin-top: 8px; }
+.ok p { color: #173404; font-size: 12px; }
+.divider { border: none; border-top: 0.5px solid var(--color-border-tertiary); margin: 2rem 0; }
+
+.mod-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+.mod-card { border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1.25rem; background: var(--color-background-primary); }
+.mod-head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.mod-icon { width: 36px; height: 36px; border-radius: var(--border-radius-md); display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+
+.role-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px,1fr)); gap: 10px; }
+.role-card { border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem; background: var(--color-background-primary); }
+
+.svc-row { display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: var(--color-background-secondary); border-radius: var(--border-radius-md); margin-bottom: 8px; border: 0.5px solid var(--color-border-tertiary); }
+.svc-badge { font-family: var(--font-mono); font-size: 10px; padding: 2px 8px; border-radius: 20px; direction: ltr; white-space: nowrap; }
+
+.api-row { display: flex; align-items: flex-start; gap: 10px; padding: 8px 0; border-bottom: 0.5px solid var(--color-border-tertiary); }
+.api-row:last-child { border-bottom: none; }
+.method { font-family: var(--font-mono); font-size: 11px; padding: 2px 8px; border-radius: 4px; direction: ltr; font-weight: 500; min-width: 52px; text-align: center; flex-shrink: 0; }
+.m-get  { background:#EAF3DE;color:#3B6D11; }
+.m-post { background:#E6F1FB;color:#0C447C; }
+.m-put  { background:#FAEEDA;color:#854F0B; }
+.m-del  { background:#FCEBEB;color:#A32D2D; }
+.api-path { font-family: var(--font-mono); font-size: 12px; color: var(--color-text-primary); direction: ltr; }
+.api-desc { font-size: 11px; color: var(--color-text-secondary); margin-top: 2px; }
+
+.db-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px,1fr)); gap: 10px; }
+.db-t { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 10px 12px; border: 0.5px solid var(--color-border-tertiary); }
+.db-t h4 { font-size: 12px; margin-bottom: 6px; }
+.field { font-family: var(--font-mono); font-size: 11px; color: var(--color-text-secondary); padding: 2px 0; direction: ltr; }
+.field.pk { color: #0C447C; }
+.field.fk { color: #854F0B; }
+.field.idx { color: #0F6E56; }
+
+.struct-row { font-family: var(--font-mono); font-size: 12px; display: block; line-height: 2; direction: ltr; color: var(--color-text-secondary); }
+.struct-folder { color: var(--color-text-primary); font-weight: 500; }
+.struct-hl { color: #0C447C; }
+.struct-note { color: #3B6D11; font-size: 11px; }
+</style>
+
+<div class="w">
+
+  <!-- HERO -->
+  <div class="card" style="background:var(--color-background-secondary); margin-bottom:2rem;">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
+      <span style="font-size:28px;">🐾</span>
+      <div>
+        <h3 style="font-size:18px;">PetClinic — نظام إدارة العيادة البيطرية</h3>
+        <p style="margin-top:3px;">حجز أطباء بيطريين مع فلترة بالسعر والموقع — 4 Microservices</p>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">
+      <span class="tag t-blue">Spring Boot 3</span>
+      <span class="tag t-green">Spring Cloud</span>
+      <span class="tag t-amber">React</span>
+      <span class="tag t-purple">MySQL</span>
+      <span class="tag t-teal">Docker</span>
+      <span class="tag t-red">JWT</span>
+    </div>
+  </div>
+
+  <!-- MODULES -->
+  <div class="sec">
+    <h2>الـ 4 Modules</h2>
+    <div class="mod-grid">
+
+      <div class="mod-card">
+        <div class="mod-head">
+          <div class="mod-icon" style="background:#E6F1FB;">🐶</div>
+          <div>
+            <span class="tag t-blue" style="margin-bottom:4px;display:block;">Module 1</span>
+            <h4>Pet & Owner Management</h4>
+          </div>
+        </div>
+        <ul>
+          <li>تسجيل صاحب الحيوان (Owner)</li>
+          <li>إضافة حيوان أليف (Pet) مع بياناته</li>
+          <li>نوع الحيوان: كلب، قط، أرنب...</li>
+          <li>التاريخ الطبي للحيوان</li>
+          <li>ربط كل حيوان بصاحبه</li>
+        </ul>
+        <div class="ok" style="margin-top:8px;"><p>الـ Service هتكون: <span class="code">pet-service</span></p></div>
+      </div>
+
+      <div class="mod-card">
+        <div class="mod-head">
+          <div class="mod-icon" style="background:#E1F5EE;">👨‍⚕️</div>
+          <div>
+            <span class="tag t-teal" style="margin-bottom:4px;display:block;">Module 2</span>
+            <h4>Vet Management + Search</h4>
+          </div>
+        </div>
+        <ul>
+          <li>بيانات كل دكتور بيطري</li>
+          <li>التخصص: كلاب، قطط، طيور...</li>
+          <li>الموقع (Location / City)</li>
+          <li>سعر الكشف</li>
+          <li>فلترة بالسعر والموقع والتخصص</li>
+        </ul>
+        <div class="ok" style="margin-top:8px;"><p>الـ Service هتكون: <span class="code">vet-service</span></p></div>
+      </div>
+
+      <div class="mod-card">
+        <div class="mod-head">
+          <div class="mod-icon" style="background:#FAEEDA;">📅</div>
+          <div>
+            <span class="tag t-amber" style="margin-bottom:4px;display:block;">Module 3</span>
+            <h4>Appointment Booking</h4>
+          </div>
+        </div>
+        <ul>
+          <li>حجز موعد لحيوان مع دكتور</li>
+          <li>عرض المواعيد المتاحة</li>
+          <li>إلغاء أو تعديل الحجز</li>
+          <li>حالة الحجز: Pending / Confirmed / Done</li>
+          <li>منع التعارض في المواعيد</li>
+        </ul>
+        <div class="ok" style="margin-top:8px;"><p>الـ Service هتكون: <span class="code">appointment-service</span></p></div>
+      </div>
+
+      <div class="mod-card">
+        <div class="mod-head">
+          <div class="mod-icon" style="background:#FCEBEB;">💊</div>
+          <div>
+            <span class="tag t-red" style="margin-bottom:4px;display:block;">Module 4</span>
+            <h4>Medical Records & Billing</h4>
+          </div>
+        </div>
+        <ul>
+          <li>تسجيل التشخيص بعد كل كشف</li>
+          <li>الوصفة الطبية والأدوية</li>
+          <li>اللقاحات والجرعات</li>
+          <li>إنشاء الفاتورة وتحصيل الدفع</li>
+          <li>تقارير مالية للعيادة</li>
+        </ul>
+        <div class="ok" style="margin-top:8px;"><p>الـ Service هتكون: <span class="code">medical-service</span></p></div>
+      </div>
+
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ROLES -->
+  <div class="sec">
+    <h2>الـ User Roles</h2>
+    <div class="role-grid">
+
+      <div class="role-card">
+        <span class="tag t-red" style="margin-bottom:8px;display:inline-block;">ADMIN</span>
+        <h4>مدير العيادة</h4>
+        <ul>
+          <li>إضافة / حذف أطباء</li>
+          <li>رؤية كل التقارير المالية</li>
+          <li>إدارة كل المستخدمين</li>
+          <li>تعديل إعدادات النظام</li>
+        </ul>
+      </div>
+
+      <div class="role-card">
+        <span class="tag t-teal" style="margin-bottom:8px;display:inline-block;">VET</span>
+        <h4>الدكتور البيطري</h4>
+        <ul>
+          <li>رؤية مواعيده بس</li>
+          <li>تسجيل التشخيص والوصفة</li>
+          <li>تحديث السجل الطبي</li>
+          <li>مش بيشوف بيانات مالية</li>
+        </ul>
+      </div>
+
+      <div class="role-card">
+        <span class="tag t-blue" style="margin-bottom:8px;display:inline-block;">PET_OWNER</span>
+        <h4>صاحب الحيوان</h4>
+        <ul>
+          <li>البحث عن دكتور بالفلاتر</li>
+          <li>حجز موعد لحيوانه</li>
+          <li>رؤية مواعيده بس</li>
+          <li>رؤية السجل الطبي لحيوانه</li>
+        </ul>
+      </div>
+
+      <div class="role-card">
+        <span class="tag t-amber" style="margin-bottom:8px;display:inline-block;">RECEPTIONIST</span>
+        <h4>موظف الاستقبال</h4>
+        <ul>
+          <li>حجز مواعيد للعملاء</li>
+          <li>تسجيل أصحاب الحيوانات</li>
+          <li>إنشاء الفواتير</li>
+          <li>مش بيحذف بيانات</li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- MICROSERVICES -->
+  <div class="sec">
+    <h2>هيكل الـ Microservices</h2>
+
+    <div class="svc-row">
+      <span class="svc-badge" style="background:#FCEBEB;color:#A32D2D;">:8761</span>
+      <div style="flex:1;"><div style="font-size:13px;font-weight:500;">eureka-server</div><div style="font-size:11px;color:var(--color-text-secondary);">دليل الـ services — يشتغل أول حاجة</div></div>
+      <span class="tag t-red">البداية</span>
+    </div>
+
+    <div class="svc-row">
+      <span class="svc-badge" style="background:#FAEEDA;color:#854F0B;">:8080</span>
+      <div style="flex:1;"><div style="font-size:13px;font-weight:500;">api-gateway</div><div style="font-size:11px;color:var(--color-text-secondary);">الباب الوحيد — كل الطلبات تعدّي منه</div></div>
+      <span class="tag t-amber">تاني</span>
+    </div>
+
+    <div class="svc-row">
+      <span class="svc-badge" style="background:#EEEDFE;color:#3C3489;">:8081</span>
+      <div style="flex:1;"><div style="font-size:13px;font-weight:500;">auth-service</div><div style="font-size:11px;color:var(--color-text-secondary);">تسجيل + Login + JWT + Roles</div></div>
+      <span class="tag t-purple">تالت</span>
+    </div>
+
+    <div class="svc-row">
+      <span class="svc-badge" style="background:#E6F1FB;color:#0C447C;">:8082</span>
+      <div style="flex:1;"><div style="font-size:13px;font-weight:500;">pet-service</div><div style="font-size:11px;color:var(--color-text-secondary);">إدارة الحيوانات الأليفة وأصحابهم</div></div>
+      <span class="tag t-blue">Module 1</span>
+    </div>
+
+    <div class="svc-row">
+      <span class="svc-badge" style="background:#E1F5EE;color:#0F6E56;">:8083</span>
+      <div style="flex:1;"><div style="font-size:13px;font-weight:500;">vet-service</div><div style="font-size:11px;color:var(--color-text-secondary);">الأطباء البيطريين + Search & Filter</div></div>
+      <span class="tag t-teal">Module 2</span>
+    </div>
+
+    <div class="svc-row">
+      <span class="svc-badge" style="background:#FAEEDA;color:#854F0B;">:8084</span>
+      <div style="flex:1;"><div style="font-size:13px;font-weight:500;">appointment-service</div><div style="font-size:11px;color:var(--color-text-secondary);">حجز المواعيد وإدارتها</div></div>
+      <span class="tag t-amber">Module 3</span>
+    </div>
+
+    <div class="svc-row">
+      <span class="svc-badge" style="background:#FCEBEB;color:#A32D2D;">:8085</span>
+      <div style="flex:1;"><div style="font-size:13px;font-weight:500;">medical-service</div><div style="font-size:11px;color:var(--color-text-secondary);">السجلات الطبية والفواتير</div></div>
+      <span class="tag t-red">Module 4</span>
+    </div>
+
+    <div class="info" style="margin-top:4px;">
+      <p>الـ Frontend بيتكلم مع <span class="code">api-gateway:8080</span> بس — مش عارف عناوين الـ services التانية خالص.</p>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- DATABASE -->
+  <div class="sec">
+    <h2>تصميم قاعدة البيانات</h2>
+    <p style="margin-bottom:12px;">كل service عندها DB مستقلة.</p>
+
+    <h3 style="margin-bottom:8px;">auth-service → <span class="code">petclinic_auth_db</span></h3>
+    <div class="db-grid" style="margin-bottom:18px;">
+      <div class="db-t">
+        <h4>users</h4>
+        <div class="field pk">id BIGINT PK</div>
+        <div class="field">name VARCHAR</div>
+        <div class="field">email VARCHAR (unique)</div>
+        <div class="field">password VARCHAR</div>
+        <div class="field idx">role ENUM</div>
+        <div class="field">is_active BOOLEAN</div>
+        <div class="field">created_at DATETIME</div>
+      </div>
+    </div>
+
+    <h3 style="margin-bottom:8px;">pet-service → <span class="code">petclinic_pet_db</span></h3>
+    <div class="db-grid" style="margin-bottom:18px;">
+      <div class="db-t">
+        <h4>owners</h4>
+        <div class="field pk">id BIGINT PK</div>
+        <div class="field fk">user_id BIGINT FK→users</div>
+        <div class="field">phone VARCHAR</div>
+        <div class="field">address VARCHAR</div>
+        <div class="field">city VARCHAR</div>
+      </div>
+      <div class="db-t">
+        <h4>pets</h4>
+        <div class="field pk">id BIGINT PK</div>
+        <div class="field fk">owner_id BIGINT FK→owners</div>
+        <div class="field">name VARCHAR</div>
+        <div class="field idx">type ENUM</div>
+        <div class="field">breed VARCHAR</div>
+        <div class="field">birth_date DATE</div>
+        <div class="field">gender ENUM</div>
+        <div class="field">weight DECIMAL</div>
+      </div>
+    </div>
+
+    <h3 style="margin-bottom:8px;">vet-service → <span class="code">petclinic_vet_db</span></h3>
+    <div class="db-grid" style="margin-bottom:18px;">
+      <div class="db-t">
+        <h4>vets</h4>
+        <div class="field pk">id BIGINT PK</div>
+        <div class="field fk">user_id BIGINT FK→users</div>
+        <div class="field">name VARCHAR</div>
+        <div class="field">phone VARCHAR</div>
+        <div class="field idx">city VARCHAR ← فلتر</div>
+        <div class="field">address VARCHAR</div>
+        <div class="field">specialization VARCHAR</div>
+        <div class="field idx">consultation_fee DECIMAL ← فلتر</div>
+        <div class="field">rating DECIMAL</div>
+        <div class="field">experience_years INT</div>
+        <div class="field">available_days VARCHAR</div>
+        <div class="field">bio TEXT</div>
+        <div class="field">is_available BOOLEAN</div>
+      </div>
+      <div class="db-t">
+        <h4>vet_specializations</h4>
+        <div class="field pk">id BIGINT PK</div>
+        <div class="field fk">vet_id BIGINT FK→vets</div>
+        <div class="field idx">animal_type ENUM ← فلتر</div>
+      </div>
+    </div>
+
+    <h3 style="margin-bottom:8px;">appointment-service → <span class="code">petclinic_appt_db</span></h3>
+    <div class="db-grid" style="margin-bottom:18px;">
+      <div class="db-t">
+        <h4>appointments</h4>
+        <div class="field pk">id BIGINT PK</div>
+        <div class="field fk">owner_id BIGINT</div>
+        <div class="field fk">pet_id BIGINT</div>
+        <div class="field fk">vet_id BIGINT</div>
+        <div class="field">appointment_date DATE</div>
+        <div class="field">start_time TIME</div>
+        <div class="field">end_time TIME</div>
+        <div class="field idx">status ENUM</div>
+        <div class="field">reason TEXT</div>
+        <div class="field">created_at DATETIME</div>
+      </div>
+    </div>
+
+    <h3 style="margin-bottom:8px;">medical-service → <span class="code">petclinic_medical_db</span></h3>
+    <div class="db-grid" style="margin-bottom:18px;">
+      <div class="db-t">
+        <h4>medical_records</h4>
+        <div class="field pk">id BIGINT PK</div>
+        <div class="field fk">appointment_id BIGINT</div>
+        <div class="field fk">pet_id BIGINT</div>
+        <div class="field fk">vet_id BIGINT</div>
+        <div class="field">diagnosis TEXT</div>
+        <div class="field">prescription TEXT</div>
+        <div class="field">notes TEXT</div>
+        <div class="field">record_date DATE</div>
+        <div class="field">follow_up_date DATE</div>
+      </div>
+      <div class="db-t">
+        <h4>vaccinations</h4>
+        <div class="field pk">id BIGINT PK</div>
+        <div class="field fk">pet_id BIGINT</div>
+        <div class="field fk">record_id BIGINT</div>
+        <div class="field">vaccine_name VARCHAR</div>
+        <div class="field">date_given DATE</div>
+        <div class="field">next_due DATE</div>
+      </div>
+      <div class="db-t">
+        <h4>invoices</h4>
+        <div class="field pk">id BIGINT PK</div>
+        <div class="field fk">appointment_id BIGINT</div>
+        <div class="field fk">owner_id BIGINT</div>
+        <div class="field">amount DECIMAL</div>
+        <div class="field idx">status ENUM</div>
+        <div class="field">issued_at DATETIME</div>
+        <div class="field">paid_at DATETIME</div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- FILTER FEATURE -->
+  <div class="sec">
+    <h2>ميزة البحث والفلترة — المميز في المشروع</h2>
+
+    <div class="card">
+      <h3 style="margin-bottom:10px;">الـ API بتاع البحث</h3>
+      <div class="api-row">
+        <span class="method m-get">GET</span>
+        <div>
+          <div class="api-path">/api/vets/search</div>
+          <div class="api-desc">بيقبل query parameters للفلترة</div>
+        </div>
+      </div>
+      <div style="margin-top:12px;">
+        <p style="margin-bottom:8px;">مثال على الطلب الكامل:</p>
+        <div style="font-family:var(--font-mono);font-size:12px;background:var(--color-background-secondary);border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);padding:12px 16px;direction:ltr;text-align:left;line-height:2;">
+GET /api/vets/search?city=Cairo&minPrice=100&maxPrice=500&animalType=CAT&sortBy=price
+        </div>
+      </div>
+      <div style="margin-top:12px;display:flex;flex-direction:column;gap:6px;">
+        <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--color-text-secondary);"><span class="code">city</span> الفلترة بالمدينة — القاهرة، الجيزة، الإسكندرية...</div>
+        <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--color-text-secondary);"><span class="code">minPrice / maxPrice</span> نطاق سعر الكشف</div>
+        <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--color-text-secondary);"><span class="code">animalType</span> نوع الحيوان: DOG / CAT / BIRD / RABBIT</div>
+        <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--color-text-secondary);"><span class="code">sortBy</span> ترتيب: price / rating / experience</div>
+        <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--color-text-secondary);"><span class="code">available</span> true/false — متاح دلوقتي بس</div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:8px;">
+      <h3 style="margin-bottom:10px;">الكود في الـ Backend — VetRepository</h3>
+      <div style="font-family:var(--font-mono);font-size:12px;background:var(--color-background-secondary);border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);padding:12px 16px;direction:ltr;text-align:left;line-height:2;overflow-x:auto;">@Query(<span style="color:#3B6D11;">"SELECT v FROM Vet v WHERE "</span> +
+       <span style="color:#3B6D11;">"(:city IS NULL OR v.city = :city) AND "</span> +
+       <span style="color:#3B6D11;">"(:minPrice IS NULL OR v.consultationFee >= :minPrice) AND "</span> +
+       <span style="color:#3B6D11;">"(:maxPrice IS NULL OR v.consultationFee <= :maxPrice) AND "</span> +
+       <span style="color:#3B6D11;">"(:available IS NULL OR v.isAvailable = :available)"</span>)
+List&lt;Vet&gt; searchVets(@Param(<span style="color:#3B6D11;">"city"</span>) String city,
+                       @Param(<span style="color:#3B6D11;">"minPrice"</span>) Double minPrice,
+                       @Param(<span style="color:#3B6D11;">"maxPrice"</span>) Double maxPrice,
+                       @Param(<span style="color:#3B6D11;">"available"</span>) Boolean available);</div>
+      <div class="info"><p>ده JPQL Query — Spring Data JPA بيترجمه لـ SQL أوتوماتيك. الـ <span class="code">:city IS NULL</span> معناه لو المستخدم مبعتش city، يجيب كل النتايج.</p></div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- PROJECT STRUCTURE -->
+  <div class="sec">
+    <h2>هيكل الفولدرات الكامل</h2>
+    <div style="background:var(--color-background-secondary);border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-lg);padding:14px 16px;overflow-x:auto;">
+      <span class="struct-row"><span class="struct-folder">petclinic-system/</span></span>
+      <span class="struct-row">├── <span class="struct-folder">eureka-server/</span>         <span class="struct-note">← مشروع Spring Boot مستقل</span></span>
+      <span class="struct-row">├── <span class="struct-folder">api-gateway/</span></span>
+      <span class="struct-row">├── <span class="struct-folder">auth-service/</span></span>
+      <span class="struct-row">│   └── src/main/java/com/petclinic/auth/</span>
+      <span class="struct-row">│       ├── controller/ ├── service/ ├── model/ ├── repository/ ├── dto/ ├── security/</span>
+      <span class="struct-row">├── <span class="struct-folder">pet-service/</span>           <span class="struct-note">← Module 1</span></span>
+      <span class="struct-row">│   └── src/main/java/com/petclinic/pet/</span>
+      <span class="struct-row">│       ├── controller/ <span class="struct-note">(PetController, OwnerController)</span></span>
+      <span class="struct-row">│       ├── service/    <span class="struct-note">(PetService, OwnerService)</span></span>
+      <span class="struct-row">│       ├── model/      <span class="struct-note">(Pet.java, Owner.java)</span></span>
+      <span class="struct-row">│       ├── repository/ ├── dto/ └── aspect/ <span class="struct-note">(LoggingAspect)</span></span>
+      <span class="struct-row">├── <span class="struct-folder">vet-service/</span>           <span class="struct-note">← Module 2 + Search & Filter</span></span>
+      <span class="struct-row">│   └── src/main/java/com/petclinic/vet/</span>
+      <span class="struct-row">│       ├── controller/ <span class="struct-note">(VetController — فيه /search endpoint)</span></span>
+      <span class="struct-row">│       ├── service/    <span class="struct-note">(VetService — فيه منطق الفلترة)</span></span>
+      <span class="struct-row">│       ├── model/      <span class="struct-note">(Vet.java, VetSpecialization.java)</span></span>
+      <span class="struct-row">│       ├── repository/ <span class="struct-note">(VetRepository — فيه الـ @Query)</span></span>
+      <span class="struct-row">│       ├── dto/</span>
+      <span class="struct-row">│       └── aspect/ <span class="struct-note">(LoggingAspect)</span></span>
+      <span class="struct-row">├── <span class="struct-folder">appointment-service/</span>   <span class="struct-note">← Module 3</span></span>
+      <span class="struct-row">├── <span class="struct-folder">medical-service/</span>       <span class="struct-note">← Module 4</span></span>
+      <span class="struct-row">├── <span class="struct-folder">frontend/</span>              <span class="struct-note">← React</span></span>
+      <span class="struct-row">└── <span class="struct-hl">docker-compose.yml</span>     <span class="struct-note">← بيشغّل كل حاجة</span></span>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- APIS -->
+  <div class="sec">
+    <h2>أهم الـ APIs</h2>
+
+    <div class="card" style="margin-bottom:10px;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;"><span class="tag t-teal">vet-service</span><h4>البحث والفلترة</h4></div>
+      <div class="api-row"><span class="method m-get">GET</span><div><div class="api-path">/api/vets/search?city=&minPrice=&maxPrice=&animalType=&sortBy=</div><div class="api-desc">البحث بكل الفلاتر مع بعض — الميزة الرئيسية</div></div></div>
+      <div class="api-row"><span class="method m-get">GET</span><div><div class="api-path">/api/vets/{id}</div><div class="api-desc">تفاصيل دكتور معين</div></div></div>
+      <div class="api-row"><span class="method m-post">POST</span><div><div class="api-path">/api/vets</div><div class="api-desc">إضافة دكتور جديد — ADMIN فقط</div></div></div>
+      <div class="api-row"><span class="method m-get">GET</span><div><div class="api-path">/api/vets/cities</div><div class="api-desc">قائمة كل المدن المتاحة للفلتر</div></div></div>
+    </div>
+
+    <div class="card" style="margin-bottom:10px;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;"><span class="tag t-blue">pet-service</span><h4>الحيوانات وأصحابهم</h4></div>
+      <div class="api-row"><span class="method m-post">POST</span><div><div class="api-path">/api/pets</div><div class="api-desc">إضافة حيوان جديد</div></div></div>
+      <div class="api-row"><span class="method m-get">GET</span><div><div class="api-path">/api/pets/owner/{ownerId}</div><div class="api-desc">كل الحيوانات بتاعة صاحب معين</div></div></div>
+      <div class="api-row"><span class="method m-get">GET</span><div><div class="api-path">/api/owners/{id}</div><div class="api-desc">بيانات صاحب الحيوان</div></div></div>
+    </div>
+
+    <div class="card" style="margin-bottom:10px;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;"><span class="tag t-amber">appointment-service</span><h4>الحجوزات</h4></div>
+      <div class="api-row"><span class="method m-post">POST</span><div><div class="api-path">/api/appointments</div><div class="api-desc">حجز موعد جديد</div></div></div>
+      <div class="api-row"><span class="method m-get">GET</span><div><div class="api-path">/api/appointments/vet/{vetId}?date=</div><div class="api-desc">المواعيد المتاحة لدكتور في يوم معين</div></div></div>
+      <div class="api-row"><span class="method m-put">PUT</span><div><div class="api-path">/api/appointments/{id}/cancel</div><div class="api-desc">إلغاء موعد</div></div></div>
+    </div>
+
+    <div class="card">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;"><span class="tag t-red">medical-service</span><h4>السجلات والفواتير</h4></div>
+      <div class="api-row"><span class="method m-post">POST</span><div><div class="api-path">/api/medical-records</div><div class="api-desc">إنشاء سجل طبي بعد الكشف</div></div></div>
+      <div class="api-row"><span class="method m-get">GET</span><div><div class="api-path">/api/medical-records/pet/{petId}</div><div class="api-desc">كل التاريخ الطبي لحيوان معين</div></div></div>
+      <div class="api-row"><span class="method m-post">POST</span><div><div class="api-path">/api/invoices</div><div class="api-desc">إنشاء فاتورة</div></div></div>
+      <div class="api-row"><span class="method m-put">PUT</span><div><div class="api-path">/api/invoices/{id}/pay</div><div class="api-desc">تسجيل الدفع</div></div></div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- AOP -->
+  <div class="sec">
+    <h2>الـ AOP في المشروع</h2>
+    <div class="card">
+      <p style="margin-bottom:10px;">هتحط <span class="code">LoggingAspect.java</span> في كل service في فولدر <span class="code">aspect/</span>:</p>
+      <div style="font-family:var(--font-mono);font-size:12px;background:var(--color-background-secondary);border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);padding:12px 16px;direction:ltr;text-align:left;line-height:2;overflow-x:auto;">@Aspect
+@Component
+public class LoggingAspect {
+
+    private static final Logger log = LoggerFactory.getLogger(LoggingAspect.class);
+
+    @Before(<span style="color:#3B6D11;">"execution(* com.petclinic.*.service.*.*(..))"</span>)
+    public void logBefore(JoinPoint joinPoint) {
+        log.info(<span style="color:#3B6D11;">"Calling: {} with args: {}"</span>,
+            joinPoint.getSignature().getName(),
+            Arrays.toString(joinPoint.getArgs()));
+    }
+
+    @AfterThrowing(pointcut = <span style="color:#3B6D11;">"execution(* com.petclinic.*.service.*.*(..))"</span>,
+                   throwing  = <span style="color:#3B6D11;">"ex"</span>)
+    public void logError(JoinPoint joinPoint, Exception ex) {
+        log.error(<span style="color:#3B6D11;">"Error in {}: {}"</span>,
+            joinPoint.getSignature().getName(), ex.getMessage());
+    }
+}</div>
+      <div class="ok" style="margin-top:10px;"><p>الـ <span class="code">@Before</span> بيشتغل قبل أي method في أي service — ده بيغطي متطلب AOP بالكامل.</p></div>
+    </div>
+  </div>
+
+</div>

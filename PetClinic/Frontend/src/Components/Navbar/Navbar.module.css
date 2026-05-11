@@ -1,0 +1,7 @@
+.Items li {
+  transition: transform 0.2s ease;
+}
+
+.Items li:hover {
+  transform: translateX(4px);
+}

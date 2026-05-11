@@ -1,0 +1,685 @@
+{
+	"info": {
+		"_postman_id": "93b901d2-774d-4b20-acb5-46dae37d794d",
+		"name": "PetClinic API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "36329985",
+		"_collection_link": "https://se2999.postman.co/workspace/SE2-Workspace~ee47cc64-0183-4c8b-856d-477bbbf958f4/collection/36329985-93b901d2-774d-4b20-acb5-46dae37d794d?action=share&source=collection_link&creator=36329985"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Register - POST",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"fullName\": \"Karim Omar\",\n  \"email\": \"karim.new@mail.com\",\n  \"password\": \"Password123\",\n  \"phone\": \"+201000009999\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/register",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login - POST",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"karim.new@mail.com\",\n  \"password\": \"Password123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Edit - PUT",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiIxIiwicm9sZSI6IlBFVF9PV05FUiIsImlhdCI6MTc3NjUwMzA0MiwiZXhwIjoxNzc2NTg5NDQyfQ.mjqXJ63uKIKeVC24NJWnuA2OzxL2utaNcRzZ1Do7_2uLbYOaGCctfMZkMOxWw01R",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"fullName\": \"Karim Omar Updated\",\n  \"phone\": \"0101234512312\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/account/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"account",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete - Delete",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiIxIiwicm9sZSI6IlBFVF9PV05FUiIsImlhdCI6MTc3NjUwMzA0MiwiZXhwIjoxNzc2NTg5NDQyfQ.mjqXJ63uKIKeVC24NJWnuA2OzxL2utaNcRzZ1Do7_2uLbYOaGCctfMZkMOxWw01R",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/account/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"account",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Owners",
+			"item": [
+				{
+					"name": "Create Owner - POST",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"userId\": 6,\n  \"name\": \"Karim Omar\",\n  \"phone\": \"+201000000601\",\n  \"address\": \"Nasr City, Abbas El Akkad\",\n  \"city\": \"Cairo\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/owners",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"owners"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Owners - GET",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/owners",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"owners"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Owner By Id - GET",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/owners/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"owners",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Pets",
+			"item": [
+				{
+					"name": "Create Pet - POST",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"ownerId\": 1,\n  \"name\": \"Luna\",\n  \"type\": \"CAT\",\n  \"breed\": \"Persian\",\n  \"birthDate\": \"2022-03-12\",\n  \"gender\": \"FEMALE\",\n  \"weight\": 4.2\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/pets",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"pets"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Pets By Owner - GET",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/pets/owner/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"pets",
+								"owner",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Vets",
+			"item": [
+				{
+					"name": "Create Vet - POST (ADMIN)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Role",
+								"value": "ADMIN"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Dr New Vet\",\n  \"phone\": \"+201122233344\",\n  \"city\": \"Cairo\",\n  \"address\": \"Heliopolis\",\n  \"specialization\": \"Small Animals\",\n  \"animalType\": \"DOG\",\n  \"consultationFee\": 300.0,\n  \"rating\": 4.6,\n  \"experienceYears\": 8,\n  \"availableDays\": \"SUN,MON,WED\",\n  \"bio\": \"Experienced vet\",\n  \"available\": true\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/vets",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"vets"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Vets - GET",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/vets",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"vets"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Vet By Id - GET",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/vets/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"vets",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Vet Cities - GET",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/vets/cities",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"vets",
+								"cities"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search Vets - GET",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/vets/search?city=Cairo&minPrice=100&maxPrice=500&animalType=CAT&sortBy=price&available=true",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"vets",
+								"search"
+							],
+							"query": [
+								{
+									"key": "city",
+									"value": "Cairo"
+								},
+								{
+									"key": "minPrice",
+									"value": "100"
+								},
+								{
+									"key": "maxPrice",
+									"value": "500"
+								},
+								{
+									"key": "animalType",
+									"value": "CAT"
+								},
+								{
+									"key": "sortBy",
+									"value": "price"
+								},
+								{
+									"key": "available",
+									"value": "true"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Appointments",
+			"item": [
+				{
+					"name": "Book Appointment - POST",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"ownerId\": 1,\n  \"petId\": 1,\n  \"vetId\": 1,\n  \"appointmentDate\": \"2026-05-01\",\n  \"startTime\": \"10:00:00\",\n  \"endTime\": \"10:30:00\",\n  \"reason\": \"Routine checkup\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/appointments",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"appointments"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Vet Appointments - GET",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/appointments/vet/1?date=2026-05-01",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"appointments",
+								"vet",
+								"1"
+							],
+							"query": [
+								{
+									"key": "date",
+									"value": "2026-05-01"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Owner Appointments - GET",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/appointments/owner/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"appointments",
+								"owner",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Medical Records",
+			"item": [
+				{
+					"name": "Create Medical Record - POST",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"appointmentId\": 1,\n  \"petId\": 1,\n  \"vetId\": 1,\n  \"diagnosis\": \"Mild dermatitis\",\n  \"prescription\": \"Topical cream\",\n  \"notes\": \"Avoid harsh shampoo\",\n  \"recordDate\": \"2026-05-01\",\n  \"followUpDate\": \"2026-05-08\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/medical-records",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"medical-records"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Medical Records By Pet - GET",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/medical-records/pet/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"medical-records",
+								"pet",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Invoices",
+			"item": [
+				{
+					"name": "Create Invoice - POST (RECEPTIONIST)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Role",
+								"value": "RECEPTIONIST"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"appointmentId\": 1,\n  \"ownerId\": 1,\n  \"amount\": 250.0\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/invoices",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"invoices"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Invoices - GET (ADMIN)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Role",
+								"value": "ADMIN"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/invoices",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"invoices"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Legacy Endpoints",
+			"item": [
+				{
+					"name": "Get Patients - GET",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/patients",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"patients"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Patient By Id - GET",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/patients/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"patients",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Doctors - GET",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/doctors",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"doctors"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Doctor By Id - GET",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/doctors/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"doctors",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Health - GET",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/api/health",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"health"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:9090"
+		}
+	]
+}

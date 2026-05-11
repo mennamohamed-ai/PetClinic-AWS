@@ -1,0 +1,110 @@
+# Production Spring Boot Configuration with CloudWatch Integration
+
+server:
+  port: ${SERVER_PORT:9090}
+  servlet:
+    context-path: /api
+
+spring:
+  application:
+    name: main-service
+  
+  # JPA Configuration
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: false
+    database-platform: org.hibernate.dialect.MySQLDialect
+    properties:
+      hibernate:
+        format_sql: true
+        jdbc:
+          batch_size: 20
+        order_inserts: true
+        order_updates: true
+  
+  # Datasource Configuration (from AWS Secrets Manager)
+  datasource:
+    url: jdbc:mysql://${SPRING_DATASOURCE_URL}?useSSL=true&allowPublicKeyRetrieval=false&serverTimezone=UTC
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      connection-timeout: 20000
+      idle-timeout: 300000
+      max-lifetime: 1200000
+  
+  # Jackson Configuration
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+      indent-output: false
+
+# Security Configuration
+security:
+  jwt:
+    secret: ${JWT_SECRET}
+    expiration-ms: ${JWT_EXPIRATION_MS:86400000}
+  cookie:
+    same-site: ${SECURITY_COOKIE_SAMESITE:Strict}
+
+# Eureka Service Discovery
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URI:http://eureka-server:8761/eureka}
+    fetch-registry: true
+    register-with-eureka: true
+    enabled: true
+  instance:
+    hostname: ${HOSTNAME:localhost}
+    instance-id: ${HOSTNAME:localhost}:${SERVER_PORT:9090}
+
+# Spring Boot Actuator (for health checks and metrics)
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+      base-path: /actuator
+  
+  endpoint:
+    health:
+      show-details: when-authorized
+  
+  # CloudWatch Integration via AWS CloudWatch Agent or Micrometer
+  metrics:
+    export:
+      cloudwatch:
+        enabled: true
+        namespace: petclinic/application
+        step: 60s
+      prometheus:
+        enabled: true
+  
+  # Logging
+  logging:
+    level:
+      root: INFO
+      com.clinic.backend: DEBUG
+      org.springframework: WARN
+      org.hibernate: WARN
+
+# Logging Configuration with CloudWatch
+logging:
+  level:
+    root: INFO
+    com.clinic.backend: DEBUG
+    org.springframework.web: INFO
+    org.springframework.security: DEBUG
+  
+  pattern:
+    console: "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+# Application Configuration
+app:
+  name: PetClinic Main Service
+  version: 1.0.0
+  environment: ${ENVIRONMENT:prod}

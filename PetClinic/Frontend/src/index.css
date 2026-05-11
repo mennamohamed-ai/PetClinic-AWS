@@ -1,0 +1,116 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+* {
+  font-family: "Roboto Slab", serif;
+  /* background-color: #3276BD; */
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+  font-family: "Montserrat", sans-serif;
+  font-style: normal;
+
+
+}
+
+@keyframes floatCat {
+
+  0%,
+  100% {
+    transform: translateY(95%);
+  }
+
+  50% {
+    transform: translateY(-10%);
+  }
+}
+
+.float-cat {
+  animation: floatCat 4s ease-in-out infinite;
+}
+
+.facebook:hover {
+  color: blue;
+  background-color: white;
+}
+
+.linked:hover {
+  color: #0276B7;
+  background-color: #E1ECF3;
+}
+
+.tiktok:hover {
+  color: black;
+  background-color: #DDDCDE;
+}
+
+.insta:hover {
+  background: linear-gradient(45deg,
+      #f09433,
+      #e6683c,
+      #dc2743,
+      #cc2366,
+      #bc1888);
+  color: white;
+}
+
+.active {
+  color: #0f0b6b;
+}
+
+.ratAnimation {
+  position: absolute;
+  /* top: 100px;  */
+  width: 80px;
+
+  animation: floatUpDown 2s ease-in-out infinite;
+}
+
+@keyframes floatUpDown {
+  0% {
+    transform: translate(-50%, 0);
+  }
+
+  50% {
+    transform: translate(-50%, -15px);
+  }
+
+  100% {
+    transform: translate(-50%, 0);
+  }
+}
+
+.animalAnimation {
+  animation: goRightAndLeft 1s ease-in-out infinite;
+}
+
+@keyframes goRightAndLeft {
+  0% {
+    transform: rotate(-10deg);
+  }
+
+  50% {
+    transform: rotate(10deg);
+  }
+
+  100% {
+    transform: rotate(-10deg);
+  }
+}
+
+.animationDuk {
+
+  animation: GoFromRightToLeft 5s ease-in-out infinite;
+
+}
+
+@keyframes GoFromRightToLeft {
+  0% {
+    transform: translateX(100vw);
+  }
+
+  100% {
+    transform: translateX(-100vw);
+  }
+}

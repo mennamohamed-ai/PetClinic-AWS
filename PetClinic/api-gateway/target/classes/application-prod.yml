@@ -1,0 +1,93 @@
+# Production Configuration for API Gateway with CloudWatch
+
+server:
+  port: ${SERVER_PORT:8080}
+  servlet:
+    context-path: /
+
+spring:
+  application:
+    name: api-gateway
+  
+  # Spring Cloud Gateway Configuration
+  cloud:
+    gateway:
+      routes:
+        - id: ml-service-api
+          uri: lb://ml-service
+          predicates:
+            - Path=/api/ml/**
+          filters:
+            - RewritePath=/api/ml/(?<segment>.*), /${segment}
+            - name: Retry
+              args:
+                retries: 3
+                methods: GET,POST
+        
+        - id: main-service-api
+          uri: lb://main-service
+          predicates:
+            - Path=/api/**
+          filters:
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter:
+                  replenishRate: 100
+                  burstCapacity: 200
+            - name: Retry
+              args:
+                retries: 3
+                methods: GET,POST
+      
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+        - name: Retry
+          args:
+            retries: 3
+            methods: GET,POST
+
+# Eureka Configuration
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URI:http://eureka-server:8761/eureka}
+    fetch-registry: true
+    register-with-eureka: true
+  instance:
+    hostname: ${HOSTNAME:localhost}
+    instance-id: ${HOSTNAME:localhost}:${SERVER_PORT:8080}
+
+# Actuator and Metrics
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,gateway
+      base-path: /actuator
+  
+  metrics:
+    export:
+      cloudwatch:
+        enabled: true
+        namespace: petclinic/api-gateway
+        step: 60s
+  
+  endpoint:
+    health:
+      show-details: when-authorized
+
+# Logging
+logging:
+  level:
+    root: INFO
+    org.springframework.cloud: DEBUG
+    org.springframework.web: INFO
+  
+  pattern:
+    console: "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+
+# Application Configuration
+app:
+  name: PetClinic API Gateway
+  version: 1.0.0
+  environment: ${ENVIRONMENT:prod}

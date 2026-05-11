@@ -1,0 +1,32 @@
+@keyframes headBob {
+
+    0%,
+    100% {
+        transform: rotate(-5deg);
+    }
+
+    50% {
+        transform: rotate(5deg);
+    }
+}
+
+.dogAnimate {
+    animation: headBob 2s ease-in-out infinite;
+    transform-origin: bottom center;
+}
+
+.Booking {
+    font-size: 26px;
+    line-height: 36px;
+    font-weight: 600;
+    color: rgb(54, 54, 54);
+}
+
+.SecText {
+    font-weight: 300;
+    Color: rgb(54, 54, 54);
+font-size: 18px;
+line-height: 27px;
+
+
+}

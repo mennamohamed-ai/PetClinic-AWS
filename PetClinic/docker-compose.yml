@@ -1,0 +1,139 @@
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: petclinic-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: petclinic_auth_db
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-proot"]
+      interval: 10s
+      timeout: 5s
+      retries: 30  # زدت المحاولات عشان نضمن الاستقرار
+    networks:
+      - app-network
+
+  frontend:
+    build:
+      context: ./Frontend
+      dockerfile: Dockerfile
+    container_name: petclinic-frontend
+    restart: unless-stopped
+    depends_on:
+      api-gateway:
+        condition: service_started
+    ports:
+      - "5173:80"
+    networks:
+      - app-network
+
+  mysql-init:
+    image: mysql:8.4
+    container_name: petclinic-mysql-init
+    depends_on:
+      mysql:
+        condition: service_healthy
+    volumes:
+      - ./mysql_petclinic_seed.sql:/init/seed.sql:ro
+      - ./update_passwords.sql:/init/update_passwords.sql:ro
+    entrypoint: ["/bin/sh", "-c"]
+    command: >
+      "mysql -h mysql -uroot -proot < /init/seed.sql &&
+       mysql -h mysql -uroot -proot < /init/update_passwords.sql &&
+       echo 'PetClinic databases initialized successfully.'"
+    restart: "no"
+    networks:
+      - app-network
+
+  eureka-server:
+    image: maven:3.9-eclipse-temurin-21
+    container_name: petclinic-eureka
+    working_dir: /app
+    volumes:
+      - ./:/app
+      - m2_cache:/root/.m2
+    command: mvn -pl eureka-server spring-boot:run
+    ports:
+      - "8761:8761"
+    networks:
+      - app-network
+
+  ml-service:
+    build:
+      context: ./ml-service
+      dockerfile: Dockerfile
+    container_name: petclinic-ml-service
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"] # اتأكد إن الـ ML فيه endpoint للهيلث
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    networks:
+      - app-network
+
+  main-service:
+    image: maven:3.9-eclipse-temurin-21
+    container_name: petclinic-main-service
+    working_dir: /app
+    volumes:
+      - ./:/app
+      - m2_cache:/root/.m2
+    command: mvn -pl main-service spring-boot:run
+    depends_on:
+      mysql:
+        condition: service_healthy
+      mysql-init:
+        condition: service_completed_successfully
+      eureka-server:
+        condition: service_started
+#      ml-service:
+#        condition: service_started # خليه يستنى الـ ML عشان الموارد
+    environment:
+      EUREKA_URI: http://eureka-server:8761/eureka
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/petclinic_auth_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+      SPRING_JPA_SHOW_SQL: "true"
+      JWT_SECRET: 5367566B59703373367639792F423F4528482B4D6251655468576D5A71347437
+      JWT_EXPIRATION_MS: 86400000
+      SECURITY_COOKIE_SAMESITE: Lax
+    ports:
+      - "9090:9090"
+    networks:
+      - app-network
+
+  api-gateway:
+    image: maven:3.9-eclipse-temurin-21
+    container_name: petclinic-api-gateway
+    working_dir: /app
+    volumes:
+      - ./:/app
+      - m2_cache:/root/.m2
+    command: mvn -pl api-gateway spring-boot:run
+    depends_on:
+      eureka-server:
+        condition: service_started
+      main-service:
+        condition: service_started
+    environment:
+      EUREKA_URI: http://eureka-server:8761/eureka
+    ports:
+      - "8080:8080"
+    networks:
+      - app-network
+
+volumes:
+  mysql_data:
+  m2_cache:
+
+networks:
+  app-network:
+    driver: bridge
