@@ -25,7 +25,7 @@ jobs:
       fail-fast: false 
       matrix:
         # شيلنا الـ frontend من هنا عشان هنعمله معاملة خاصة للـ S3
-        service: [backend, api-gateway, ml-service]
+        service: [backend, api-gateway, ml-service, eureka-server]
         include:
           - service: backend
             dockerfile: Backend/Dockerfile
@@ -36,6 +36,10 @@ jobs:
           - service: ml-service
             dockerfile: ml-service/Dockerfile
             context: ./ml-service
+                 - service: eureka-server
+            dockerfile: eureka-server/Dockerfile
+            context: ./eureka-server
+
     
     steps:
       - name: Checkout code
@@ -121,6 +125,7 @@ jobs:
 
       - name: Deploy Services to ECS
         run: |
+                 aws ecs update-service --cluster petclinic-prod-cluster --service petclinic-prod-eureka-server --force-new-deployment --region us-east-1
           aws ecs update-service --cluster petclinic-prod-cluster --service petclinic-prod-api-gateway --force-new-deployment --region us-east-1
           aws ecs update-service --cluster petclinic-prod-cluster --service petclinic-prod-backend-service --force-new-deployment --region us-east-1
           aws ecs update-service --cluster petclinic-prod-cluster --service petclinic-prod-ml-service --force-new-deployment --region us-east-1
