@@ -24,8 +24,8 @@ jobs:
     strategy:
       fail-fast: false 
       matrix:
-        # شيلنا الـ frontend من هنا عشان هنعمله معاملة خاصة للـ S3
-        service: [backend, api-gateway, ml-service, eureka-server]
+       
+       service: [backend, api-gateway, ml-service, eureka-server]
         include:
           - service: backend
             dockerfile: Backend/Dockerfile
