@@ -14,7 +14,7 @@ spring:
     gateway:
       routes:
         - id: ml-service-api
-          uri: lb://ml-service
+          uri: http://petclinic-prod-alb-2142133629.us-east-1.elb.amazonaws.com
           predicates:
             - Path=/api/ml/**
           filters:
@@ -25,15 +25,10 @@ spring:
                 methods: GET,POST
         
         - id: main-service-api
-          uri: lb://main-service
+          uri: http://petclinic-prod-alb-2142133629.us-east-1.elb.amazonaws.com
           predicates:
             - Path=/api/**
           filters:
-            - name: RequestRateLimiter
-              args:
-                redis-rate-limiter:
-                  replenishRate: 100
-                  burstCapacity: 200
             - name: Retry
               args:
                 retries: 3
@@ -46,16 +41,6 @@ spring:
             retries: 3
             methods: GET,POST
 
-# Eureka Configuration
-eureka:
-  client:
-    service-url:
-      defaultZone: ${EUREKA_URI:http://eureka-server:8761/eureka}
-    fetch-registry: true
-    register-with-eureka: true
-  instance:
-    hostname: ${HOSTNAME:localhost}
-    instance-id: ${HOSTNAME:localhost}:${SERVER_PORT:8080}
 
 # Actuator and Metrics
 management:
