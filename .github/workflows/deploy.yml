@@ -38,7 +38,7 @@ jobs:
             context: ./ml-service
           - service: eureka-server
             dockerfile: eureka-server/Dockerfile
-            context: ./eureka-server
+            context: .
     
     steps:
       - name: Checkout code
