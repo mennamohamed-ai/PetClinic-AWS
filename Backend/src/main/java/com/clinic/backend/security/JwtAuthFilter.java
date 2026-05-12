@@ -14,11 +14,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-/**
- * JWT Authentication Filter
- * يقرأ الـ JWT من الـ Cookie أو Authorization header,
- * يتحقق منه، ويحط المستخدم في الـ SecurityContext.
- */
+
 @Component
 public class JwtAuthFilter extends OncePerRequestFilter {
 
@@ -50,18 +46,14 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 AuthenticatedUser tokenUser = jwtService.parseToken(token);
                 var patient = patientService.getById(tokenUser.userId());
                 AuthenticatedUser user = new AuthenticatedUser(patient.getId(), patient.getRole());
-
-                // حط المستخدم كـ request attribute عشان Controllers تقدر توصله
                 request.setAttribute(ATTR_AUTHENTICATED_USER, user);
 
-                // حط المستخدم في Spring Security Context
                 var authorities = List.of(new SimpleGrantedAuthority("ROLE_" + user.role().name()));
                 var auth = new UsernamePasswordAuthenticationToken(user, null, authorities);
                 SecurityContextHolder.getContext().setAuthentication(auth);
 
             } catch (Exception ex) {
-                // Token غلط أو منتهي — مش بنرجع error هنا,
-                // Spring Security هيتكلف بالـ endpoints المحمية
+        
             }
         }
 
