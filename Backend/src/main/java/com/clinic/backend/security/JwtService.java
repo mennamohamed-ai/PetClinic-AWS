@@ -35,6 +35,7 @@ public class JwtService {
         this.tokenTtlMs = tokenTtlMs;
     }
 
+    
     public String generateToken(Long userId, Role role) {
         Instant now = Instant.now();
         Instant expiry = now.plusMillis(tokenTtlMs);
