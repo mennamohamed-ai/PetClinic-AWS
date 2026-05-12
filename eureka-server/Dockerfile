@@ -5,6 +5,7 @@ COPY eureka-server ./eureka-server
 COPY api-gateway ./api-gateway
 COPY Backend ./Backend
 COPY main-service ./main-service
+COPY ml-service ./ml-service
 RUN mvn -pl eureka-server -am clean package -DskipTests
 
 FROM eclipse-temurin:17-jre-alpine
